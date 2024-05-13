@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
-	"github.com/rupeshtr78/nvidia-metrics/pkg"
+	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
 )
 
-var logger, _ = pkg.Logger()
+var err = logger.GetLogger()
 
 // GetGPUUtilization returns the GPU utilization of the device.
 // The GPU utilization is the percent of time over the past sample period during which one or more kernels was executing on the GPU.
@@ -88,13 +88,13 @@ func CollectGpuMetrics() {
 		logger.Debug("GPU metrics", zap.String("name", deviceName), zap.Uint("temperature", uint(temperature)))
 
 		// Set the prometheus metrics for the GPU
-		gpuId.WithLabelValues(fmt.Sprintf("gpu_id%d", i)).Set(float64(i))
-		gpuName.WithLabelValues(fmt.Sprintf("gpu_name%v", deviceName)).Set(float64(i))
-		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(temperature))
-		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(utilization.Gpu))
-		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(utilization.Memory))
-		gpuPowerUsageMetric.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(gpuPowerUsage) / 1000)
-		gpuRunningProcess.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(len(runningProcess)))
-		gpuUtilizationRates.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(utilizationRates.Gpu))
+		gpuId.WithLabelValues(fmt.Sprintf("gpu_id: %d", i)).Set(float64(i))
+		gpuName.WithLabelValues(fmt.Sprintf("gpu_name: %v", deviceName)).Set(float64(i))
+		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu_id: %d, gpu_name: %v", i, deviceName)).Set(float64(temperature))
+		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu_id: %d, gpu_name: %v", i, deviceName)).Set(float64(utilization.Gpu))
+		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu_id: %d, gpu_name: %v", i, deviceName)).Set(float64(utilization.Memory))
+		gpuPowerUsageMetric.WithLabelValues(fmt.Sprintf("gpu_id: %d, gpu_name: %v", i, deviceName)).Set(float64(gpuPowerUsage) / 1000)
+		gpuRunningProcess.WithLabelValues(fmt.Sprintf("gpu_id: %d, gpu_name: %v", i, deviceName)).Set(float64(len(runningProcess)))
+		gpuUtilizationRates.WithLabelValues(fmt.Sprintf("gpu_id: %d, gpu_name: %v", i, deviceName)).Set(float64(utilizationRates.Gpu))
 	}
 }

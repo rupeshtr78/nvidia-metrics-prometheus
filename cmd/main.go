@@ -6,10 +6,10 @@ import (
 
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
 	"github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics/api"
-	"github.com/rupeshtr78/nvidia-metrics/pkg"
+	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 )
 
-var logger, _ = pkg.Logger()
+var err = logger.GetLogger()
 
 func main() {
 	fmt.Println("Hello, nvidia-metrics")

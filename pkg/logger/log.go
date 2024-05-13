@@ -3,51 +3,50 @@
 // In this package we initate the logger.
 // go get -u go.uber.org/zap
 // go get -u go.uber.org/zap/zapcore
-package pkg
+package logger
 
 import (
 	"fmt"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
 )
 
+// logger is the global logger instance.
 var logger *zap.Logger
 
+func GetLogger() (err error) {
+	config := zap.NewProductionConfig()
+	config.EncoderConfig.TimeKey = "timestamp"
+	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
-func Logger() (logger *zap.Logger, err error) {
- config := zap.NewProductionConfig()
- config.EncoderConfig.TimeKey = "timestamp"
- config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	logger, err = config.Build()
 
- logger, err = config.Build()
+	if err != nil {
+		err = fmt.Errorf("Failed to initialize logger: %v", err)
+		return err
+	}
 
- if err != nil {
-  err = fmt.Errorf("Failed to initialize logger: %v", err)
-  os.Exit(1)
-  return nil, err
- }
-
- return logger, nil
+	return nil
 
 }
 
 func Info(message string, fields ...zap.Field) {
- logger.Info(message, fields...)
+	logger.Info(message, fields...)
 }
 
 func Error(message string, fields ...zap.Field) {
- logger.Error(message, fields...)
+	logger.Error(message, fields...)
 }
 
 func Debug(message string, fields ...zap.Field) {
- logger.Debug(message, fields...)
+	logger.Debug(message, fields...)
 }
 
 func Warn(message string, fields ...zap.Field) {
- logger.Warn(message, fields...)
+	logger.Warn(message, fields...)
 }
 
 func Fatal(message string, fields ...zap.Field) {
- logger.Fatal(message, fields...)
+	logger.Fatal(message, fields...)
 }
