@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/rupeshtr78/nvidia-metrics/api"
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
 	prometheusmetrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
@@ -26,7 +25,8 @@ func main() {
 	}
 
 	// run the metrics server
-	api.RunMetrics()
+	// api.RunMetrics()
+	RunMetricsLocal()
 
 }
 
