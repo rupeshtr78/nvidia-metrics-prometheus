@@ -19,5 +19,5 @@ func RunMetrics() {
 		}
 	}()
 
-	log.Fatal(http.ListenAndServe(":9100", nil))
+	log.Fatal(http.ListenAndServe(":9500", nil))
 }

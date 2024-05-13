@@ -5,6 +5,7 @@ import (
 	"time"
 
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
+	"github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics/api"
 	"github.com/rupeshtr78/nvidia-metrics/pkg"
 )
 
@@ -14,11 +15,12 @@ func main() {
 	fmt.Println("Hello, nvidia-metrics")
 	logger.Info("Starting nvidia-metrics")
 
-	RunMetrics()
+	api.RunMetrics()
 
 }
 
-func RunMetrics() {
+func RunMetricsLocal() {
+
 	for {
 		nvidiametrics.CollectGpuMetrics()
 		time.Sleep(30 * time.Second)
