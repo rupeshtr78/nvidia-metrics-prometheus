@@ -89,7 +89,7 @@ func CreatePrometheusMetrics(filePath string) error {
 }
 
 // createGauge creates a new gauge with labels and sets the value
-func CreateGauge(name string, labels map[string]string, value float64) {
+func CreateGauge(name string, labels map[string]string, value float64) error {
 	// Get the gauge vector from the metrics map
 	// check if the metric exists in prometheus
 
@@ -100,15 +100,13 @@ func CreateGauge(name string, labels map[string]string, value float64) {
 
 	gaugeVec, ok := MetricsMap[name]
 	if !ok {
-		logger.Error("Failed to find metric", zap.String("metric", name))
-		return
+		return fmt.Errorf("failed to find metric: %s", name)
 	}
 
 	// Check if the metric is already registered
 	registered, err := IsMetricRegistered(gaugeVec)
 	if err != nil && !registered {
-		logger.Error("Not registered metric", zap.String("metric", name), zap.Error(err))
-		return
+		return err
 	}
 
 	// If registered, create a new gauge with labels
@@ -118,12 +116,12 @@ func CreateGauge(name string, labels map[string]string, value float64) {
 		// Set the value
 		gauge.Set(value)
 		// Add the gauge to the gauge map
-		logger.Info("Created gauge", zap.String("metric", name))
 		GuageMap[name] = gauge
 	} else {
-		logger.Error("Failed to create gauge", zap.String("metric", name))
-		return
+		return fmt.Errorf("failed to create gauge: %s", name)
 	}
+
+	return nil
 }
 
 // IsMetricRegistered attempts to register a collector and checks if it is already registered.
