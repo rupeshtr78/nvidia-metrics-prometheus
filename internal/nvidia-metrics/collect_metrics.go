@@ -80,6 +80,9 @@ func collectDeviceMetrics(deviceIndex int) {
 	if err == nvml.SUCCESS {
 		setGaugeMetric("gpu_running_process", labels, float64(len(runningProcess)))
 	}
+
+	// Add more metrics here as needed.
+	logger.Info("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 }
 
 // setGaugeMetric sets a gauge metric with the given name, labels, and value.
