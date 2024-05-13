@@ -67,13 +67,34 @@ func CollectGpuMetrics() {
 			continue
 		}
 
-		logger.Debug("GPU metrics", zap.String("name", name), zap.Uint("temperature", uint(temperature)))
+		gpuPowerUsage, err := handle.GetPowerUsage()
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting power usage:", err)
+			continue
+		}
+
+		runningProcess, err := handle.GetComputeRunningProcesses()
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting running processes:", err)
+			continue
+		}
+
+		utilizationRates, err := handle.GetUtilizationRates()
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting utilization rates:", err)
+			continue
+		}
+
+		logger.Debug("GPU metrics", zap.String("name", deviceName), zap.Uint("temperature", uint(temperature)))
 
 		// Set the prometheus metrics for the GPU
 		gpuId.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(i))
-		gpuName.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(deviceName)
+		gpuName.WithLabelValues(fmt.Sprintf("gpu%v", deviceName)).Set(float64(i))
 		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(temperature))
 		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilization.Gpu))
 		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilization.Memory))
+		gpuPowerUsageMetric.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(gpuPowerUsage) / 1000)
+		gpuRunningProcess.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(len(runningProcess)))
+		gpuUtilizationRates.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilizationRates.Gpu))
 	}
 }

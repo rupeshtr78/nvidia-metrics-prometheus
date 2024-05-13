@@ -10,7 +10,7 @@ var (
 			Name: "gpu_id",
 			Help: "ID of the GPU.",
 		},
-		[]string{"gpu"},
+		[]string{"gpu_id"},
 	)
 
 	gpuName = prometheus.NewGaugeVec(
@@ -18,22 +18,22 @@ var (
 			Name: "gpu_name",
 			Help: "Name of the GPU.",
 		},
-		[]string{"gpu"},
+		[]string{"gpu_name"},
 	)
 
 	gpuUtilization = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gpu_utilization",
+			Name: "gpu_cpu_utilization",
 			Help: "GPU utilization in percent.",
 		},
-		[]string{"gpu"},
+		[]string{"gpu_cpu_utilization"},
 	)
 	gpuMemoryUtilization = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_mem_utilization",
 			Help: "GPU memory utilization in percent.",
 		},
-		[]string{"gpu"},
+		[]string{"gpu_mem_utilization"},
 	)
 
 	gpuTemperature = prometheus.NewGaugeVec(
@@ -41,7 +41,31 @@ var (
 			Name: "gpu_temperature",
 			Help: "Temperature of the GPU in degrees Celsius.",
 		},
-		[]string{"gpu"},
+		[]string{"gpu_temp"},
+	)
+
+	gpuPowerUsageMetric = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "gpu_power_usage",
+			Help: "Power usage of the GPU in watts.",
+		},
+		[]string{"gpu_power_usage"},
+	)
+
+	gpuRunningProcess = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "gpu_running_process",
+			Help: "Number of running processes on the GPU.",
+		},
+		[]string{"gpu_running_process"},
+	)
+
+	gpuUtilizationRates = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "gpu_utilization_rates",
+			Help: "Utilization rates of the GPU.",
+		},
+		[]string{"gpu_utilization_rates"},
 	)
 )
 
@@ -51,4 +75,7 @@ func init() {
 	prometheus.MustRegister(gpuUtilization)
 	prometheus.MustRegister(gpuTemperature)
 	prometheus.MustRegister(gpuMemoryUtilization)
+	prometheus.MustRegister(gpuPowerUsageMetric)
+	prometheus.MustRegister(gpuRunningProcess)
+	prometheus.MustRegister(gpuUtilizationRates)
 }
