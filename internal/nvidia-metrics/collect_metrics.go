@@ -55,6 +55,8 @@ func collectDeviceMetrics(deviceIndex int) {
 		return
 	}
 
+	logger.Debug("Collecting GPU metrics", zap.Int("device_index", deviceIndex), zap.String("device_name", deviceName))
+
 	labels := map[string]string{
 		"gpu_id":   fmt.Sprintf("%d", deviceIndex),
 		"gpu_name": deviceName,
@@ -64,6 +66,8 @@ func collectDeviceMetrics(deviceIndex int) {
 	if err == nvml.SUCCESS {
 		setGaugeMetric("gpu_temperature", labels, float64(temperature))
 	}
+
+	logger.Debug("Collected GPU temperature", zap.Int("device_index", deviceIndex), zap.Float64("temperature", float64(temperature)))
 
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
