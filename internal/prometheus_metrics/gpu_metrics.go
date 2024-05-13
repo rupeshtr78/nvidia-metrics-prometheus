@@ -2,6 +2,7 @@ package prometheusmetrics
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
@@ -23,11 +24,11 @@ type GpuMetric struct {
 }
 
 // NewGaugeVec creates a new gauge vector and registers it with Prometheus.
-func RegisterMetric(gpuMetric GpuMetric) error {
+func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	if gpuMetric.Type != "gauge" {
 		err := fmt.Errorf("unsupported metric type: %s", gpuMetric.Type)
 		logger.Error("unsupported metric type", zap.String("type", gpuMetric.Type))
-		return err
+		return nil, err
 	}
 
 	// Create a new gauge vector
@@ -43,28 +44,19 @@ func RegisterMetric(gpuMetric GpuMetric) error {
 	registered, err := IsMetricRegistered(gaugeVec)
 	if err != nil {
 		logger.Error("failed to check if metric is registered", zap.String("metric", gpuMetric.Name), zap.Error(err))
-		return err
+		return nil, err
 	}
 
 	if !registered {
-
 		// Register the metric
 		if err := prometheus.Register(gaugeVec); err != nil {
 			logger.Error("failed to register metric", zap.String("metric", gpuMetric.Name), zap.Error(err))
-			return err
+			return nil, err
 		}
-
-		// Add the metric to the metrics map
-		if MetricsMap == nil {
-			MetricsMap = make(map[string]*prometheus.GaugeVec)
-		}
-
-		// Add the metric to the metrics map
-		MetricsMap[gpuMetric.Name] = gaugeVec
+	} else {
+		logger.Error("metric already registered", zap.String("metric", gpuMetric.Name))
 	}
-
-	logger.Error("metric already registered", zap.String("metric", gpuMetric.Name))
-	return nil
+	return gaugeVec, nil
 }
 
 // CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
@@ -83,10 +75,14 @@ func CreatePrometheusMetrics(filePath string) {
 
 	// create prometheus metrics from yaml
 	for _, metric := range m.MetricList {
-		err := RegisterMetric(metric)
+		gaugeVec, err := RegisterMetric(metric)
 		if err != nil {
 			logger.Error("Failed to create prometheus metric", zap.Error(err))
 		}
+
+		// Add the metric to the metrics map
+		MetricsMap[metric.Name] = gaugeVec
+
 	}
 }
 
@@ -94,6 +90,11 @@ func CreatePrometheusMetrics(filePath string) {
 func CreateGauge(name string, labels map[string]string, value float64) {
 	// Get the gauge vector from the metrics map
 	// check if the metric exists in prometheus
+
+	if MetricsMap == nil {
+		logger.Error("Metrics map is nil")
+		os.Exit(1)
+	}
 
 	gaugeVec, ok := MetricsMap[name]
 	if !ok {
