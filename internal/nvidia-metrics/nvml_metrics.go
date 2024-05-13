@@ -61,6 +61,17 @@ func CollectGpuMetrics() {
 			continue
 		}
 
-		logger.Info("GPU metrics", zap.String("name", name), zap.Uint("temperature", uint(temperature)))
+		utilization, err := handle.GetUtilizationRates()
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting utilization rates:", err)
+			continue
+		}
+
+		logger.Debug("GPU metrics", zap.String("name", name), zap.Uint("temperature", uint(temperature)))
+		gpuId.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(i))
+		gpuName.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(1) // Assuming name is a string
+		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(temperature))
+		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilization.Gpu))
+		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilization.Memory))
 	}
 }
