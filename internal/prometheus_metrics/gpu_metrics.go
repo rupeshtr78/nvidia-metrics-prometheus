@@ -39,22 +39,32 @@ func RegisterMetric(gpuMetric GpuMetric) error {
 		gpuMetric.Labels,
 	)
 
-	// Register the metric
-	if err := prometheus.Register(gaugeVec); err != nil {
-		logger.Error("failed to register metric", zap.String("metric", gpuMetric.Name), zap.Error(err))
+	// Check if the metric is already registered
+	registered, err := IsMetricRegistered(gaugeVec)
+	if err != nil {
+		logger.Error("failed to check if metric is registered", zap.String("metric", gpuMetric.Name), zap.Error(err))
 		return err
 	}
 
-	// Add the metric to the metrics map
-	if MetricsMap == nil {
-		MetricsMap = make(map[string]*prometheus.GaugeVec)
+	if !registered {
+
+		// Register the metric
+		if err := prometheus.Register(gaugeVec); err != nil {
+			logger.Error("failed to register metric", zap.String("metric", gpuMetric.Name), zap.Error(err))
+			return err
+		}
+
+		// Add the metric to the metrics map
+		if MetricsMap == nil {
+			MetricsMap = make(map[string]*prometheus.GaugeVec)
+		}
+
+		// Add the metric to the metrics map
+		MetricsMap[gpuMetric.Name] = gaugeVec
 	}
 
-	// Add the metric to the metrics map
-	MetricsMap[gpuMetric.Name] = gaugeVec
-
+	logger.Error("metric already registered", zap.String("metric", gpuMetric.Name))
 	return nil
-
 }
 
 // CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
