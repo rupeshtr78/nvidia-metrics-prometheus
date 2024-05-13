@@ -22,13 +22,16 @@ func init() {
 		fmt.Println(err)
 	}
 
-	setLogLevel("debug")
 }
 
 func GetLogger() (err error) {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	config.InitialFields = map[string]interface{}{
+		"app": "nvidia-metrics",
+	}
+	config.Level = setLogLevel("debug")
 
 	logger, err = config.Build()
 
@@ -61,37 +64,23 @@ func Fatal(message string, fields ...zap.Field) {
 	logger.Fatal(message, fields...)
 }
 
-func setLogLevel(level string) {
+func setLogLevel(level string) zap.AtomicLevel {
+	atomicLevel := zap.NewAtomicLevel()
 	switch level {
 	case "debug":
-		logger.Info("Setting log level to debug")
-		config := zap.NewProductionConfig()
-		config.Level.SetLevel(zapcore.DebugLevel)
-		logger, _ = config.Build()
+		atomicLevel.SetLevel(zap.DebugLevel)
 	case "info":
-		logger.Info("Setting log level to info")
-		config := zap.NewProductionConfig()
-		config.Level.SetLevel(zapcore.InfoLevel)
-		logger, _ = config.Build()
+		atomicLevel.SetLevel(zap.InfoLevel)
 	case "warn":
-		logger.Info("Setting log level to warn")
-		config := zap.NewProductionConfig()
-		config.Level.SetLevel(zapcore.WarnLevel)
-		logger, _ = config.Build()
+		atomicLevel.SetLevel(zap.WarnLevel)
 	case "error":
-		logger.Info("Setting log level to error")
-		config := zap.NewProductionConfig()
-		config.Level.SetLevel(zapcore.ErrorLevel)
-		logger, _ = config.Build()
+		atomicLevel.SetLevel(zap.ErrorLevel)
 	case "fatal":
-		logger.Info("Setting log level to fatal")
-		config := zap.NewProductionConfig()
-		config.Level.SetLevel(zapcore.FatalLevel)
-		logger, _ = config.Build()
+		atomicLevel.SetLevel(zap.FatalLevel)
 	default:
-		logger.Info("Setting log level to info")
-		config := zap.NewProductionConfig()
-		config.Level.SetLevel(zapcore.InfoLevel)
-		logger, _ = config.Build()
+		atomicLevel.SetLevel(zap.InfoLevel)
 	}
+
+	return atomicLevel
+
 }
