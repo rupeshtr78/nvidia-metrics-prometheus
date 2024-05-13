@@ -78,26 +78,15 @@ func CreatePrometheusMetrics(filePath string) {
 	}
 }
 
-// CreateGuage creates a new gauge and registers it with Prometheus
-func CreateGuage(name string, help string, labels prometheus.Labels) error {
-	gauge := prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: name,
-			Help: help,
-		},
-	)
-
-	// Register the metric
-	if err := prometheus.Register(gauge); err != nil {
-		logger.Error("failed to register metric", zap.String("metric", name), zap.Error(err))
-		return err
+// createGauge creates a new gauge with labels and sets the value
+func CreateGauge(name string, labels map[string]string, value float64) {
+	// Get the gauge vector from the metrics map
+	gaugeVec, ok := MetricsMap[name]
+	if !ok {
+		logger.Error("Failed to find metric", zap.String("metric", name))
+		return
 	}
 
-	// Add the metric to the metrics map
-	if GuageMap == nil {
-		GuageMap = make(map[string]prometheus.Gauge)
-	}
-	GuageMap[name] = gauge
-
-	return nil
+	// Set the prometheus metrics for the GPU maps to label values and sets the value
+	gaugeVec.With(labels).Set(value)
 }
