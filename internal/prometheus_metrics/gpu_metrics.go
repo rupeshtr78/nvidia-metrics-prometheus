@@ -54,6 +54,8 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 			return nil, err
 		}
 	}
+
+	logger.Info("Registered metric", zap.String("metric", gpuMetric.Name))
 	return gaugeVec, nil
 }
 
@@ -62,7 +64,7 @@ func CreatePrometheusMetrics(filePath string) error {
 	// 	// read from config/metrics.yaml
 	m, err := LoadFromYAML(filePath)
 	if err != nil {
-		logger.Error("Failed to load metrics from yaml file", zap.String("file", filePath), zap.Error(err))
+		logger.Error("Failed to read metrics yaml file", zap.String("file", filePath), zap.Error(err))
 		return err
 	}
 

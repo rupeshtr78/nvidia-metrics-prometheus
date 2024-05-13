@@ -11,14 +11,14 @@ import (
 func RunMetrics() {
 
 	http.Handle("/metrics", promhttp.Handler())
-	// go func() {
-	// 	for {
-	// 		nvidiametrics.CollectGpuMetrics()
-	// 		// time.Sleep(30 * time.Second)
-	// 	}
-	// }()
+	go func() {
+		for {
+			nvidiametrics.CollectGpuMetrics()
+			// time.Sleep(30 * time.Second)
+		}
+	}()
 
-	nvidiametrics.CollectGpuMetrics()
+	// nvidiametrics.CollectGpuMetrics()
 
 	log.Fatal(http.ListenAndServe(":9500", nil))
 }

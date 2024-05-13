@@ -46,9 +46,9 @@ metrics:
       - gpu_id
       - gpu_name
 
-  - name: gpu_utilization_rates
-    type: gauge
-    help: "Utilization rates of the GPU."
-    labels:
-      - gpu_id
-      - gpu_name
+  # - name: gpu_utilization_rates
+  #   type: gauge
+  #   help: "Utilization rates of the GPU."
+  #   labels:
+  #     - gpu_id
+  #     - gpu_name
