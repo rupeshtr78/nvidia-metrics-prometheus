@@ -112,7 +112,7 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 	// If registered, create a new gauge with labels
 	if registered {
 		// Create a new gauge with labels
-		gauge := gaugeVec.With(labels)
+		gauge := gaugeVec.WithLabelValues(labels["gpu_id"], labels["gpu_name"])
 		// Set the value
 		gauge.Set(value)
 		// Add the gauge to the gauge map

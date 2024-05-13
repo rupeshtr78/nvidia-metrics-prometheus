@@ -82,7 +82,7 @@ func collectDeviceMetrics(deviceIndex int) {
 	}
 
 	// Add more metrics here as needed.
-	logger.Info("Collected GPU metrics", zap.Int("device_index", deviceIndex))
+	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 }
 
 // setGaugeMetric sets a gauge metric with the given name, labels, and value.
