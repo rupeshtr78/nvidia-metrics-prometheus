@@ -1,7 +1,9 @@
 package nvidiametrics
 
 import (
-	"github.com/NVIDIA/gpu-monitoring-tools/bindings/go/nvml"
+	"fmt"
+
+	"github.com/NVIDIA/go-nvml/pkg/nvml"
 	"github.com/rupeshtr78/nvidia-metrics/pkg"
 	"go.uber.org/zap"
 )
@@ -11,66 +13,54 @@ var logger, _ = pkg.Logger()
 // GetGPUUtilization returns the GPU utilization of the device.
 // The GPU utilization is the percent of time over the past sample period during which one or more kernels was executing on the GPU.
 
-func initNVML() {
+func InitNVML() {
 	err := nvml.Init()
-	if err != nil {
+	if err != nvml.SUCCESS {
 		logger.Fatal("Failed to initialize NVML", zap.Error(err))
 
 	}
+
+	logger.Info("Initialized NVML")
 }
 
-func shutdownNVML() {
+func ShutdownNVML() {
 	err := nvml.Shutdown()
-	if err != nil {
+	if err != nvml.SUCCESS {
 		logger.Fatal("Failed to shutdown NVML", zap.Error(err))
 	}
+
+	logger.Info("Shutdown NVML")
 }
 
 func CollectGpuMetrics() {
+	nvml.Init()
+	defer nvml.Shutdown()
 
-	count, err := nvml.GetDeviceCount()
-	if err != nil {
-		logger.Fatal("Failed to get device count", zap.Error(err))
+	deviceCount, err := nvml.DeviceGetCount()
+	if err != nvml.SUCCESS {
+		fmt.Println("Error getting device count:", err)
+		return
 	}
 
-	if count == 0 {
-		logger.Fatal("No devices found")
+	for i := 0; i < int(deviceCount); i++ {
+		handle, err := nvml.DeviceGetHandleByIndex(i)
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting device handle:", err)
+			continue
+		}
+
+		name, err := handle.GetName()
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting device name:", err)
+			continue
+		}
+
+		temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
+		if err != nvml.SUCCESS {
+			fmt.Println("Error getting temperature:", err)
+			continue
+		}
+
+		logger.Info("GPU metrics", zap.String("name", name), zap.Uint("temperature", uint(temperature)))
 	}
-
-	for i := uint(0); i < count; i++ {
-		device, err := nvml.NewDevice(i)
-		if err != nil {
-			logger.Fatal("Failed to get device", zap.Error(err))
-		}
-
-		deviceId, err := device.GetGPUInstanceId()
-		if err != nil {
-			logger.Error("Failed to get GPU instance ID", zap.Error(err))
-		}
-
-		deviceName := device.Model
-		if err != nil {
-			logger.Error("Failed to get device name", zap.Error(err))
-		}
-
-		gpuUtilization, err := device.GetUtilizationRates()
-		if err != nil {
-			logger.Error("Failed to get GPU utilization", zap.Error(err))
-		}
-
-		gpuTemperature, err := device.GetTemperature()
-		if err != nil {
-			logger.Error("Failed to get GPU temperature", zap.Error(err))
-		}
-
-		logger.Info("GPU metrics",
-			zap.Uint("device_id", deviceId),
-			zap.String("device_name", deviceName),
-			zap.Uint("gpu_utilization", gpuUtilization.GPU),
-			zap.Uint("memory_utilization", gpuUtilization.Memory),
-			zap.Uint("temperature", gpuTemperature),
-		)
-
-	}
-
 }
