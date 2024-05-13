@@ -112,9 +112,9 @@ func CreateGauge(name string, labels map[string]string, value float64) {
 	}
 
 	// If registered, get the existing gauge
-	if m, ok := MetricsMap[name]; ok {
+	if registered {
 		// Create a new gauge with labels
-		gauge := m.With(labels)
+		gauge := gaugeVec.With(labels)
 		// Set the value
 		gauge.Set(value)
 		// Add the gauge to the gauge map
