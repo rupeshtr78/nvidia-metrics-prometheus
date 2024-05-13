@@ -49,7 +49,7 @@ func CollectGpuMetrics() {
 			continue
 		}
 
-		name, err := handle.GetName()
+		deviceName, err := handle.GetName()
 		if err != nvml.SUCCESS {
 			fmt.Println("Error getting device name:", err)
 			continue
@@ -68,8 +68,10 @@ func CollectGpuMetrics() {
 		}
 
 		logger.Debug("GPU metrics", zap.String("name", name), zap.Uint("temperature", uint(temperature)))
+
+		// Set the prometheus metrics for the GPU
 		gpuId.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(i))
-		gpuName.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(1) // Assuming name is a string
+		gpuName.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(deviceName)
 		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(temperature))
 		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilization.Gpu))
 		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu%d", i)).Set(float64(utilization.Memory))
