@@ -88,13 +88,13 @@ func CollectGpuMetrics() {
 		logger.Debug("GPU metrics", zap.String("name", deviceName), zap.Uint("temperature", uint(temperature)))
 
 		// Set the prometheus metrics for the GPU
-		gpuId.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(i))
-		gpuName.WithLabelValues(fmt.Sprintf("gpu%v", deviceName)).Set(float64(i))
-		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(temperature))
-		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(utilization.Gpu))
-		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(utilization.Memory))
-		gpuPowerUsageMetric.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(gpuPowerUsage) / 1000)
-		gpuRunningProcess.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(len(runningProcess)))
-		gpuUtilizationRates.WithLabelValues(fmt.Sprintf("gpu%d, gpu_name%v", i, deviceName)).Set(float64(utilizationRates.Gpu))
+		gpuId.WithLabelValues(fmt.Sprintf("gpu_id%d", i)).Set(float64(i))
+		gpuName.WithLabelValues(fmt.Sprintf("gpu_name%v", deviceName)).Set(float64(i))
+		gpuTemperature.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(temperature))
+		gpuUtilization.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(utilization.Gpu))
+		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(utilization.Memory))
+		gpuPowerUsageMetric.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(gpuPowerUsage) / 1000)
+		gpuRunningProcess.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(len(runningProcess)))
+		gpuUtilizationRates.WithLabelValues(fmt.Sprintf("gpu_id%d, gpu_name%v", i, deviceName)).Set(float64(utilizationRates.Gpu))
 	}
 }
