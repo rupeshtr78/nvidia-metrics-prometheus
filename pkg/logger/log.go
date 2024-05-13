@@ -15,6 +15,13 @@ import (
 // logger is the global logger instance.
 var logger *zap.Logger
 
+func init() {
+	err := GetLogger()
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func GetLogger() (err error) {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.TimeKey = "timestamp"

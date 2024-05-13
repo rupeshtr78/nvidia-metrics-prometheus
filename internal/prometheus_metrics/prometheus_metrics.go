@@ -1,11 +1,11 @@
-package nvidiametrics
+package prometheusmetrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
-	gpuId = prometheus.NewGaugeVec(
+	GpuId = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_id",
 			Help: "ID of the GPU.",
@@ -13,7 +13,7 @@ var (
 		[]string{"gpu_id"},
 	)
 
-	gpuName = prometheus.NewGaugeVec(
+	GpuName = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_name",
 			Help: "Name of the GPU.",
@@ -21,14 +21,15 @@ var (
 		[]string{"gpu_name"},
 	)
 
-	gpuUtilization = prometheus.NewGaugeVec(
+	GpuUtilization = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_cpu_utilization",
 			Help: "GPU utilization in percent.",
 		},
 		[]string{"gpu_id", "gpu_name"},
 	)
-	gpuMemoryUtilization = prometheus.NewGaugeVec(
+
+	GpuMemoryUtilization = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_mem_utilization",
 			Help: "GPU memory utilization in percent.",
@@ -36,7 +37,7 @@ var (
 		[]string{"gpu_id", "gpu_name"},
 	)
 
-	gpuTemperature = prometheus.NewGaugeVec(
+	GpuTemperature = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_temperature",
 			Help: "Temperature of the GPU in degrees Celsius.",
@@ -44,7 +45,7 @@ var (
 		[]string{"gpu_id", "gpu_name"},
 	)
 
-	gpuPowerUsageMetric = prometheus.NewGaugeVec(
+	GpuPowerUsageMetric = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_power_usage",
 			Help: "Power usage of the GPU in watts.",
@@ -52,7 +53,7 @@ var (
 		[]string{"gpu_id", "gpu_name"},
 	)
 
-	gpuRunningProcess = prometheus.NewGaugeVec(
+	GpuRunningProcess = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_running_process",
 			Help: "Number of running processes on the GPU.",
@@ -60,7 +61,7 @@ var (
 		[]string{"gpu_id", "gpu_name"},
 	)
 
-	gpuUtilizationRates = prometheus.NewGaugeVec(
+	GpuUtilizationRates = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gpu_utilization_rates",
 			Help: "Utilization rates of the GPU.",
@@ -70,11 +71,11 @@ var (
 )
 
 func init() {
-	prometheus.MustRegister(gpuId)
-	prometheus.MustRegister(gpuName)
-	prometheus.MustRegister(gpuUtilization)
-	prometheus.MustRegister(gpuTemperature)
-	prometheus.MustRegister(gpuMemoryUtilization)
-	prometheus.MustRegister(gpuPowerUsageMetric)
-	prometheus.MustRegister(gpuRunningProcess)
+	prometheus.MustRegister(GpuId)
+	prometheus.MustRegister(GpuName)
+	prometheus.MustRegister(GpuUtilization)
+	prometheus.MustRegister(GpuTemperature)
+	prometheus.MustRegister(GpuMemoryUtilization)
+	prometheus.MustRegister(GpuPowerUsageMetric)
+	prometheus.MustRegister(GpuRunningProcess)
 }

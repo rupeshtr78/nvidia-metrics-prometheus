@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
+	metrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -83,13 +84,13 @@ func CollectGpuMetrics() {
 		logger.Debug("GPU metrics", zap.String("name", deviceName), zap.Uint("temperature", uint(temperature)))
 
 		// Set the prometheus metrics for the GPU maps to label values and sets the value
-		gpuId.WithLabelValues(fmt.Sprintf("%d", i)).Set(float64(i))
-		gpuName.WithLabelValues(fmt.Sprintf("%v", deviceName)).Set(float64(i))
-		gpuTemperature.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(temperature))
-		gpuUtilization.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(utilization.Gpu))
-		gpuMemoryUtilization.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(utilization.Memory))
-		gpuPowerUsageMetric.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(gpuPowerUsage) / 1000)
-		gpuRunningProcess.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(len(runningProcess)))
+		metrics.GpuId.WithLabelValues(fmt.Sprintf("%d", i)).Set(float64(i))
+		metrics.GpuName.WithLabelValues(fmt.Sprintf("%v", deviceName)).Set(float64(i))
+		metrics.GpuTemperature.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(temperature))
+		metrics.GpuUtilization.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(utilization.Gpu))
+		metrics.GpuMemoryUtilization.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(utilization.Memory))
+		metrics.GpuPowerUsageMetric.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(gpuPowerUsage) / 1000)
+		metrics.GpuRunningProcess.WithLabelValues(fmt.Sprintf(("%d"), i), fmt.Sprintf("%v", deviceName)).Set(float64(len(runningProcess)))
 
 	}
 }
