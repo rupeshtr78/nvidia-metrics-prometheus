@@ -111,13 +111,14 @@ func CreateGauge(name string, labels map[string]string, value float64) {
 		return
 	}
 
-	// If registered, get the existing gauge
+	// If registered, create a new gauge with labels
 	if registered {
 		// Create a new gauge with labels
 		gauge := gaugeVec.With(labels)
 		// Set the value
 		gauge.Set(value)
 		// Add the gauge to the gauge map
+		logger.Info("Created gauge", zap.String("metric", name))
 		GuageMap[name] = gauge
 	} else {
 		logger.Error("Failed to create gauge", zap.String("metric", name))
