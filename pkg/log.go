@@ -14,16 +14,22 @@ import (
 
 var logger *zap.Logger
 
-func init() {
+
+func Logger() (logger *zap.Logger, err error) {
  config := zap.NewProductionConfig()
  config.EncoderConfig.TimeKey = "timestamp"
  config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
- var err error
+
  logger, err = config.Build()
+
  if err != nil {
-  fmt.Printf("Error initializing logger: %v\n", err)
+  err = fmt.Errorf("Failed to initialize logger: %v", err)
   os.Exit(1)
+  return nil, err
  }
+
+ return logger, nil
+
 }
 
 func Info(message string, fields ...zap.Field) {

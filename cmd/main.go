@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, https://github.com/rupeshtr78/nvidia-metrics.git")
+	fmt.Println("Hello, nvidia-metrics")
 }
