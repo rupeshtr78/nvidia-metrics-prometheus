@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rupeshtr78/nvidia-metrics/internal/api"
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
-	"github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics/api"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 )
 
