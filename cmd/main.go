@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
 	prometheusmetrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
@@ -32,8 +31,5 @@ func main() {
 
 func RunMetricsLocal() {
 
-	for {
-		nvidiametrics.CollectGpuMetrics()
-		time.Sleep(30 * time.Second)
-	}
+	nvidiametrics.CollectGpuMetrics()
 }
