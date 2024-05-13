@@ -43,7 +43,34 @@ func CollectGpuMetrics() {
 			logger.Fatal("Failed to get device", zap.Error(err))
 		}
 
-		gpuId.WithLabelValues(device.UUID).Set(float64(device.UUID))
+		deviceId, err := device.GetGPUInstanceId()
+		if err != nil {
+			logger.Error("Failed to get GPU instance ID", zap.Error(err))
+		}
+
+		deviceName := device.Model
+		if err != nil {
+			logger.Error("Failed to get device name", zap.Error(err))
+		}
+
+		gpuUtilization, err := device.GetUtilizationRates()
+		if err != nil {
+			logger.Error("Failed to get GPU utilization", zap.Error(err))
+		}
+
+		gpuTemperature, err := device.GetTemperature()
+		if err != nil {
+			logger.Error("Failed to get GPU temperature", zap.Error(err))
+		}
+
+		logger.Info("GPU metrics",
+			zap.Uint("device_id", deviceId),
+			zap.String("device_name", deviceName),
+			zap.Uint("gpu_utilization", gpuUtilization.GPU),
+			zap.Uint("memory_utilization", gpuUtilization.Memory),
+			zap.Uint("temperature", gpuTemperature),
+		)
+
 	}
 
 }
