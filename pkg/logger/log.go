@@ -17,9 +17,12 @@ var logger *zap.Logger
 
 func init() {
 	err := GetLogger()
+
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	setLogLevel("debug")
 }
 
 func GetLogger() (err error) {
@@ -56,4 +59,39 @@ func Warn(message string, fields ...zap.Field) {
 
 func Fatal(message string, fields ...zap.Field) {
 	logger.Fatal(message, fields...)
+}
+
+func setLogLevel(level string) {
+	switch level {
+	case "debug":
+		logger.Info("Setting log level to debug")
+		config := zap.NewProductionConfig()
+		config.Level.SetLevel(zapcore.DebugLevel)
+		logger, _ = config.Build()
+	case "info":
+		logger.Info("Setting log level to info")
+		config := zap.NewProductionConfig()
+		config.Level.SetLevel(zapcore.InfoLevel)
+		logger, _ = config.Build()
+	case "warn":
+		logger.Info("Setting log level to warn")
+		config := zap.NewProductionConfig()
+		config.Level.SetLevel(zapcore.WarnLevel)
+		logger, _ = config.Build()
+	case "error":
+		logger.Info("Setting log level to error")
+		config := zap.NewProductionConfig()
+		config.Level.SetLevel(zapcore.ErrorLevel)
+		logger, _ = config.Build()
+	case "fatal":
+		logger.Info("Setting log level to fatal")
+		config := zap.NewProductionConfig()
+		config.Level.SetLevel(zapcore.FatalLevel)
+		logger, _ = config.Build()
+	default:
+		logger.Info("Setting log level to info")
+		config := zap.NewProductionConfig()
+		config.Level.SetLevel(zapcore.InfoLevel)
+		logger, _ = config.Build()
+	}
 }
