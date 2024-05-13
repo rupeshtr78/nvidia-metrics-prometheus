@@ -49,6 +49,8 @@ func RegisterMetric(gpuMetric GpuMetric) error {
 	if MetricsMap == nil {
 		MetricsMap = make(map[string]*prometheus.GaugeVec)
 	}
+
+	// Add the metric to the metrics map
 	MetricsMap[gpuMetric.Name] = gaugeVec
 
 	return nil
@@ -81,12 +83,46 @@ func CreatePrometheusMetrics(filePath string) {
 // createGauge creates a new gauge with labels and sets the value
 func CreateGauge(name string, labels map[string]string, value float64) {
 	// Get the gauge vector from the metrics map
+	// check if the metric exists in prometheus
+
 	gaugeVec, ok := MetricsMap[name]
 	if !ok {
 		logger.Error("Failed to find metric", zap.String("metric", name))
 		return
 	}
 
-	// Set the prometheus metrics for the GPU maps to label values and sets the value
-	gaugeVec.With(labels).Set(value)
+	// Check if the metric is already registered
+	registered, err := IsMetricRegistered(gaugeVec)
+	if err != nil && !registered {
+		logger.Error("Not registered metric", zap.String("metric", name), zap.Error(err))
+		return
+	}
+
+	// If registered, get the existing gauge
+	if m, ok := MetricsMap[name]; ok {
+		// Create a new gauge with labels
+		gauge := m.With(labels)
+		// Set the value
+		gauge.Set(value)
+		// Add the gauge to the gauge map
+		GuageMap[name] = gauge
+	} else {
+		logger.Error("Failed to create gauge", zap.String("metric", name))
+		return
+	}
+}
+
+// IsMetricRegistered attempts to register a collector and checks if it is already registered.
+func IsMetricRegistered(collector prometheus.Collector) (bool, error) {
+	err := prometheus.Register(collector)
+	if err == nil {
+		return false, nil // Successfully registered, not previously registered
+	}
+
+	if _, ok := err.(prometheus.AlreadyRegisteredError); ok {
+		return true, nil // Already registered
+	}
+
+	// Other kinds of errors indicate different problems with registration.
+	return false, err
 }
