@@ -53,8 +53,6 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 			logger.Error("failed to register metric", zap.String("metric", gpuMetric.Name), zap.Error(err))
 			return nil, err
 		}
-	} else {
-		logger.Error("metric already registered", zap.String("metric", gpuMetric.Name))
 	}
 	return gaugeVec, nil
 }
