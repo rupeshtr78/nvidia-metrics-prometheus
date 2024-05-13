@@ -58,30 +58,32 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 }
 
 // CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
-func CreatePrometheusMetrics(filePath string) {
+func CreatePrometheusMetrics(filePath string) error {
 	// 	// read from config/metrics.yaml
 	m, err := LoadFromYAML(filePath)
 	if err != nil {
 		logger.Error("Failed to load metrics from yaml file", zap.String("file", filePath), zap.Error(err))
-		return
+		return err
 	}
 
 	if len(m.MetricList) == 0 {
 		logger.Error("No metrics found in the yaml file", zap.String("file", filePath))
-		return
+		return fmt.Errorf("no metrics found in the yaml file")
 	}
 
 	// create prometheus metrics from yaml
 	for _, metric := range m.MetricList {
 		gaugeVec, err := RegisterMetric(metric)
 		if err != nil {
-			logger.Error("Failed to create prometheus metric", zap.Error(err))
+			return err
 		}
 
 		// Add the metric to the metrics map
 		MetricsMap[metric.Name] = gaugeVec
 
 	}
+
+	return nil
 }
 
 // createGauge creates a new gauge with labels and sets the value
