@@ -77,5 +77,4 @@ func init() {
 	prometheus.MustRegister(gpuMemoryUtilization)
 	prometheus.MustRegister(gpuPowerUsageMetric)
 	prometheus.MustRegister(gpuRunningProcess)
-	prometheus.MustRegister(gpuUtilizationRates)
 }
