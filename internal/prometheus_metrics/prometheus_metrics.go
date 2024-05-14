@@ -1,81 +1,99 @@
 package prometheusmetrics
 
 import (
+	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
+	"github.com/rupeshtr78/nvidia-metrics/pkg/utils"
+	"go.uber.org/zap"
 )
 
-var (
-	GpuId = prometheus.NewGaugeVec(
+// NewGaugeVec creates a new gauge vector and registers it with Prometheus.
+func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
+	if gpuMetric.Type != "gauge" {
+		err := fmt.Errorf("unsupported metric type: %s", gpuMetric.Type)
+		logger.Error("unsupported metric type", zap.String("type", gpuMetric.Type))
+		return nil, err
+	}
+
+	labels, err := utils.GetLabelList(gpuMetric.Labels)
+	if err != nil {
+		logger.Error("failed to get labels", zap.Error(err))
+		return nil, err
+	}
+
+	// Create a new gauge vector
+	gaugeVec := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gpu_id",
-			Help: "ID of the GPU.",
+			Name: gpuMetric.Name,
+			Help: gpuMetric.Help,
 		},
-		[]string{"gpu_id"},
+		labels,
 	)
 
-	GpuName = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_name",
-			Help: "Name of the GPU.",
-		},
-		[]string{"gpu_name"},
-	)
+	// Unregister first; if not registered no operations will be performed
+	if !prometheus.Unregister(gaugeVec) {
+		logger.Warn("metric was already registered or could not be unregistered for other reasons")
+	}
 
-	GpuUtilization = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_cpu_utilization",
-			Help: "GPU utilization in percent.",
-		},
-		[]string{"gpu_id", "gpu_name"},
-	)
+	err = prometheus.Register(gaugeVec)
+	if err != nil {
+		logger.Error("failed to register metric", zap.Error(err))
+		return nil, err
+	}
 
-	GpuMemoryUtilization = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_mem_utilization",
-			Help: "GPU memory utilization in percent.",
-		},
-		[]string{"gpu_id", "gpu_name"},
-	)
+	logger.Info("Verified registration of", zap.String("metric", gpuMetric.Name))
+	return gaugeVec, nil
+}
 
-	GpuTemperature = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_temperature",
-			Help: "Temperature of the GPU in degrees Celsius.",
-		},
-		[]string{"gpu_id", "gpu_name"},
-	)
+// CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
+func CreatePrometheusMetrics(filePath string) error {
+	var m MetricsV2
+	// 	// read from config/metrics.yaml
 
-	GpuPowerUsageMetric = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_power_usage",
-			Help: "Power usage of the GPU in watts.",
-		},
-		[]string{"gpu_id", "gpu_name"},
-	)
+	err := utils.LoadFromYAMLV2(filePath, m)
+	if err != nil {
+		logger.Fatal("Failed to read metrics yaml file", zap.String("file", filePath), zap.Error(err))
+		return err
+	}
 
-	GpuRunningProcess = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_running_process",
-			Help: "Number of running processes on the GPU.",
-		},
-		[]string{"gpu_id", "gpu_name"},
-	)
+	if len(m.MetricList) == 0 {
+		logger.Error("No metrics found in the yaml file", zap.String("file", filePath))
+		return fmt.Errorf("no metrics found in the yaml file")
+	}
 
-	GpuUtilizationRates = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "gpu_utilization_rates",
-			Help: "Utilization rates of the GPU.",
-		},
-		[]string{"gpu_id", "gpu_name"},
-	)
-)
+	// create prometheus metrics from yaml
+	for _, metric := range m.MetricList {
+		gaugeVec, err := RegisterMetric(metric)
+		if err != nil {
+			return err
+		}
 
-func init() {
-	prometheus.MustRegister(GpuId)
-	prometheus.MustRegister(GpuName)
-	prometheus.MustRegister(GpuUtilization)
-	prometheus.MustRegister(GpuTemperature)
-	prometheus.MustRegister(GpuMemoryUtilization)
-	prometheus.MustRegister(GpuPowerUsageMetric)
-	prometheus.MustRegister(GpuRunningProcess)
+		// Add the metric to the metrics map
+		MetricsMap[metric.Name] = gaugeVec
+
+	}
+
+	return nil
+}
+
+// RegisterMetric ensures that the provided GaugeVec is only registered once.
+// If an attempt is made to register an already registered GaugeVec,
+// it handles the error gracefully.
+func RegisterGPuMetric(gaugeVec *prometheus.GaugeVec) error {
+	if !prometheus.Unregister(gaugeVec) { // Unregister first; no-op if not registered
+		logger.Warn("metric was already registered or could not be unregistered for other reasons")
+	}
+
+	err := prometheus.Register(gaugeVec)
+	if err != nil {
+		logger.Error("failed to register metric", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func GetLables(labels map[string]string) prometheus.Labels {
+	return prometheus.Labels(labels)
 }

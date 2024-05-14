@@ -3,48 +3,48 @@ metrics:
     type: gauge
     help: "ID of the GPU."
     labels:
-      - gpu_id
+      - label1: gpu_id
 
   - name: gpu_name
     type: gauge
     help: "Name of the GPU."
     labels:
-      - gpu_name
+      - label1: gpu_name
 
   - name: gpu_cpu_utilization
     type: gauge
     help: "GPU utilization in percent."
     labels:
-      - gpu_id
-      - gpu_name
+      - label1: gpu_id
+      - label2: gpu_name
 
   - name: gpu_mem_utilization
     type: gauge
     help: "GPU memory utilization in percent."
     labels:
-      - gpu_id
-      - gpu_name
+      - label1: gpu_id
+      - label2: gpu_name
 
   - name: gpu_temperature
     type: gauge
     help: "Temperature of the GPU in degrees Celsius."
     labels:
-      - gpu_id
-      - gpu_name
+      - label1: gpu_id
+      - label2: gpu_name
 
   - name: gpu_power_usage
     type: gauge
     help: "Power usage of the GPU in watts."
     labels:
-      - gpu_id
-      - gpu_name
+      - label1: gpu_id
+      - label2: gpu_name
 
   - name: gpu_running_process
     type: gauge
     help: "Number of running processes on the GPU."
     labels:
-      - gpu_id
-      - gpu_name
+      - label1: gpu_id
+      - label2: gpu_name
 
   # - name: gpu_utilization_rates
   #   type: gauge

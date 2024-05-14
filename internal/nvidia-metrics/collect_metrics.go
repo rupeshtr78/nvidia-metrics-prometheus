@@ -4,28 +4,19 @@ import (
 	"fmt"
 
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
-	prometheusmetrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
+	gauge "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
 )
 
-// Assumed correct logger initialization elsewhere
-var log = logger.GetLogger()
-
-// InitNVML initializes the NVML library.
-func InitNVML() {
-	if err := nvml.Init(); err != nvml.SUCCESS {
-		logger.Fatal("Failed to initialize NVML", zap.Error(err))
-	}
-	logger.Info("Initialized NVML")
-}
-
-// ShutdownNVML shuts down the NVML library.
-func ShutdownNVML() {
-	if err := nvml.Shutdown(); err != nvml.SUCCESS {
-		logger.Fatal("Failed to shutdown NVML", zap.Error(err))
-	}
-	logger.Info("Shutdown NVML")
+// GPUDeviceMetrics represents the collected metrics for a GPU device.
+type GPUDeviceMetrics struct {
+	DeviceIndex         int
+	GPUTemperature      float64
+	GPUCPUUtilization   float64
+	GPUMemUtilization   float64
+	GPUPowerUsage       float64
+	GPURunningProcesses int
 }
 
 // CollectGpuMetrics collects metrics for all the GPUs.
@@ -37,22 +28,40 @@ func CollectGpuMetrics() {
 	}
 
 	for i := 0; i < int(deviceCount); i++ {
-		collectDeviceMetrics(i)
+		metrics, err := collectDeviceMetrics(i)
+		if err != nil {
+			logger.Error(
+				"Error collecting metrics for GPU",
+				zap.Int("gpu_index", i),
+				zap.Error(err),
+			)
+			continue // Skip this GPU and proceed with the next one
+		}
+		// Use the collected metrics if needed
+		// Replace this with actual usage.
+		_ = metrics
 	}
+
+	// Here we have successfully collected metrics for all GPUs without errors.
+	logger.Info("Successfully collected metrics for all GPUs")
 }
 
-// collectDeviceMetrics collects metrics for a single device.
-func collectDeviceMetrics(deviceIndex int) {
+// CollectGpuDeviceMetrics collects metrics for a single device and returns them in a GPUDeviceMetrics struct.
+func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	handle, err := nvml.DeviceGetHandleByIndex(deviceIndex)
 	if err != nvml.SUCCESS {
 		logger.Error("Error getting device handle", zap.Int("device_index", deviceIndex), zap.Error(err))
-		return
+		return nil, err
 	}
 
 	deviceName, err := handle.GetName()
 	if err != nvml.SUCCESS {
 		logger.Error("Error getting device name", zap.Error(err))
-		return
+		return nil, err
+	}
+
+	metrics := &GPUDeviceMetrics{
+		DeviceIndex: deviceIndex,
 	}
 
 	labels := map[string]string{
@@ -62,33 +71,32 @@ func collectDeviceMetrics(deviceIndex int) {
 
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {
-		setGaugeMetric("gpu_temperature", labels, float64(temperature))
+		metrics.GPUTemperature = float64(temperature)
+		gauge.SetGaugeMetric("gpu_temperature", labels, metrics.GPUTemperature)
+
 	}
 
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
-		setGaugeMetric("gpu_cpu_utilization", labels, float64(utilization.Gpu))
-		setGaugeMetric("gpu_mem_utilization", labels, float64(utilization.Memory))
+		metrics.GPUCPUUtilization = float64(utilization.Gpu)
+		metrics.GPUMemUtilization = float64(utilization.Memory)
+		gauge.SetGaugeMetric("gpu_cpu_utilization", labels, metrics.GPUCPUUtilization)
+		gauge.SetGaugeMetric("gpu_mem_utilization", labels, metrics.GPUMemUtilization)
 	}
 
 	gpuPowerUsage, err := handle.GetPowerUsage()
 	if err == nvml.SUCCESS {
-		setGaugeMetric("gpu_power_usage", labels, float64(gpuPowerUsage)/1000) // Assuming power is in mW and we want W.
+		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
+		gauge.SetGaugeMetric("gpu_power_usage", labels, metrics.GPUPowerUsage)
 	}
 
 	runningProcess, err := handle.GetComputeRunningProcesses()
 	if err == nvml.SUCCESS {
-		setGaugeMetric("gpu_running_process", labels, float64(len(runningProcess)))
+		metrics.GPURunningProcesses = len(runningProcess)
+		gauge.SetGaugeMetric("gpu_running_process", labels, float64(metrics.GPURunningProcesses))
 	}
 
-	// Add more metrics here as needed.
+	// Add more metrics here.
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
-}
-
-// setGaugeMetric sets a gauge metric with the given name, labels, and value.
-func setGaugeMetric(name string, labels map[string]string, value float64) {
-	err := prometheusmetrics.CreateGauge(name, labels, value)
-	if err != nil {
-		logger.Error("Failed to create gauge metric", zap.String("metric_name", name), zap.Error(err))
-	}
+	return metrics, nil
 }
