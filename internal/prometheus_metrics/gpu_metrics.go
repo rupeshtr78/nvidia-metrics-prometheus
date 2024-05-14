@@ -159,6 +159,7 @@ func DeleteMetrics(filePath string) error {
 
 		// delete the metric from the metrics map
 		delete(MetricsMap, metric.Name)
+		logger.Info("Deleted metric", zap.String("metric", metric.Name))
 
 	}
 
