@@ -33,3 +33,4 @@ go.work
 .iml
 modules.xml
 vcs.xml
+/.idea
