@@ -2,7 +2,6 @@ package prometheusmetrics
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
@@ -41,11 +40,7 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	)
 
 	// Check if the metric is already registered
-	registered, err := IsMetricRegistered(gaugeVec)
-	if err != nil {
-		logger.Error("failed to check if metric is registered", zap.String("metric", gpuMetric.Name), zap.Error(err))
-		return nil, err
-	}
+	registered := IsMetricRegisteredV2(gaugeVec)
 
 	if !registered {
 		// Register the metric
@@ -95,7 +90,7 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 
 	if MetricsMap == nil {
 		logger.Error("Metrics map is nil")
-		os.Exit(1)
+		return fmt.Errorf("metrics map is nil")
 	}
 
 	gaugeVec, ok := MetricsMap[name]
@@ -103,23 +98,12 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 		return fmt.Errorf("failed to find metric: %s", name)
 	}
 
-	// Check if the metric is already registered
-	registered, err := IsMetricRegistered(gaugeVec)
-	if err != nil && !registered {
-		return err
-	}
-
 	// If registered, create a new gauge with labels
-	if registered {
-		// Create a new gauge with labels
-		gauge := gaugeVec.WithLabelValues(labels["gpu_id"], labels["gpu_name"])
-		// Set the value
-		gauge.Set(value)
-		// Add the gauge to the gauge map
-		GuageMap[name] = gauge
-	} else {
-		return fmt.Errorf("failed to create gauge: %s", name)
-	}
+	gauge := gaugeVec.With(labels)
+	// Set the value
+	gauge.Set(value)
+	// Add the gauge to the gauge map
+	GuageMap[name] = gauge
 
 	return nil
 }
@@ -137,4 +121,16 @@ func IsMetricRegistered(collector prometheus.Collector) (bool, error) {
 
 	// Other kinds of errors indicate different problems with registration.
 	return false, err
+}
+
+// IsMetricRegistered checks if the collector is already registered with Prometheus.
+func IsMetricRegisteredV2(collector prometheus.Collector) bool {
+	err := prometheus.Register(collector)
+	if _, ok := err.(prometheus.AlreadyRegisteredError); ok {
+		return true // Already registered
+	}
+	if err == nil {
+		prometheus.Unregister(collector) // Unregister if it was just registered for the check
+	}
+	return false
 }
