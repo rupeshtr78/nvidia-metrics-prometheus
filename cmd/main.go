@@ -12,14 +12,12 @@ import (
 	"go.uber.org/zap"
 )
 
-var err = logger.GetLogger()
-
 func main() {
-	fmt.Println("Hello, nvidia-metrics")
-	logger.Info("Starting nvidia-metrics")
+	fmt.Println("Starting prometheus nvidia-metrics")
 
 	// Deletes the metric first
-	prometheusmetrics.DeleteMetrics("config/metrics.yaml")
+	// prometheusmetrics.DeleteMetrics("config/metrics.yaml")
+
 	// Register the metrics with Prometheus
 	err := prometheusmetrics.CreatePrometheusMetrics("config/metrics.yaml")
 	if err != nil {

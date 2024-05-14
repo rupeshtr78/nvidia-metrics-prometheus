@@ -33,7 +33,12 @@ func GetLogger() (err error) {
 	}
 	config.Level = setLogLevel("debug")
 
-	logger, err = config.Build()
+	// Enable caller information reporting.
+	// Modify the EncoderConfig for the caller key and format
+	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder // Use ShortCallerEncoder to log the relative path
+	config.EncoderConfig.CallerKey = "caller"                      // Specify the key used for the caller in structured logs
+
+	logger, err = config.Build(zap.AddCallerSkip(1)) // Skip one level to account for this wrapper.
 
 	if err != nil {
 		err = fmt.Errorf("Failed to initialize logger: %v", err)

@@ -42,12 +42,15 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	// Check if the metric is already registered
 	registered := IsMetricRegisteredV2(gaugeVec)
 
+	logger.Debug("Is metric registered", zap.String("metric", gpuMetric.Name), zap.Bool("registered", registered))
+
 	if !registered {
 		// Register the metric
-		if err := prometheus.Register(gaugeVec); err != nil {
-			logger.Error("failed to register metric", zap.String("metric", gpuMetric.Name), zap.Error(err))
-			return nil, err
-		}
+		prometheus.MustRegister(gaugeVec)
+		// if err := prometheus.MustRegister(gaugeVec); err != nil {
+		// 	logger.Error("failed to register metric", zap.String("metric", gpuMetric.Name), zap.Error(err))
+		// 	return nil, err
+		// }
 	}
 
 	logger.Info("Registered metric", zap.String("metric", gpuMetric.Name))
