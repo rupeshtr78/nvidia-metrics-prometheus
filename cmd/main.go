@@ -18,6 +18,8 @@ func main() {
 	fmt.Println("Hello, nvidia-metrics")
 	logger.Info("Starting nvidia-metrics")
 
+	// Deletes the metric first
+	prometheusmetrics.DeleteMetrics("config/metrics.yaml")
 	// Register the metrics with Prometheus
 	err := prometheusmetrics.CreatePrometheusMetrics("config/metrics.yaml")
 	if err != nil {

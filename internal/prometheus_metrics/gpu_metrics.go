@@ -134,3 +134,32 @@ func IsMetricRegisteredV2(collector prometheus.Collector) bool {
 	}
 	return false
 }
+
+// DeleteMetric reads from config/metrics.yaml and deleted prometheus metrics
+func DeleteMetrics(filePath string) error {
+	// 	// read from config/metrics.yaml
+	m, err := LoadFromYAML(filePath)
+	if err != nil {
+		logger.Error("Failed to read metrics yaml file", zap.String("file", filePath), zap.Error(err))
+		return err
+	}
+
+	if len(m.MetricList) == 0 {
+		logger.Error("No metrics found in the yaml file", zap.String("file", filePath))
+		return fmt.Errorf("no metrics found in the yaml file")
+	}
+
+	// delete prometheus metrics from yaml
+	for _, metric := range m.MetricList {
+		err := DeleteMetrics(metric.Name)
+		if err != nil {
+			return err
+		}
+
+		// delete the metric from the metrics map
+		delete(MetricsMap, metric.Name)
+
+	}
+
+	return nil
+}
