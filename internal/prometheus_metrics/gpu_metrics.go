@@ -101,7 +101,7 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 	// If registered, create a new gauge with labels
 	gauge := gaugeVec.With(labels)
 	// Set the value
-	gauge.Set(value)
+	gauge.Set(float64(value))
 	// Add the gauge to the gauge map
 	GuageMap[name] = gauge
 
