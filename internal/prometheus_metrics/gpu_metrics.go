@@ -104,7 +104,7 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 	gauge.Set(float64(value))
 	// Add the gauge to the gauge map
 	GuageMap[name] = gauge
-	logger.Info("Created the gauge", zap.String("name", name), zap.Any("labels", labels), zap.Float64("value", value))
+	logger.Debug("Created the gauge", zap.String("name", name), zap.Any("labels", labels), zap.Float64("value", value))
 
 	return nil
 }
