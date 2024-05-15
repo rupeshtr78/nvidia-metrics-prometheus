@@ -34,7 +34,7 @@ func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 
 	// Unregister first; if not registered no operations will be performed
 	if !prometheus.Unregister(gaugeVec) {
-		logger.Warn("metric was already registered or could not be unregistered for other reasons")
+		logger.Warn("metric was already registered", zap.String("metric", gpuMetric.Name))
 	}
 
 	err = prometheus.Register(gaugeVec)
@@ -75,22 +75,6 @@ func CreatePrometheusMetrics(filePath string) error {
 
 	}
 
-	return nil
-}
-
-// RegisterMetric ensures that the provided GaugeVec is only registered once.
-// If an attempt is made to register an already registered GaugeVec,
-// it handles the error gracefully.
-func RegisterGPuMetric(gaugeVec *prometheus.GaugeVec) error {
-	if !prometheus.Unregister(gaugeVec) { // Unregister first; no-op if not registered
-		logger.Warn("metric was already registered or could not be unregistered for other reasons")
-	}
-
-	err := prometheus.Register(gaugeVec)
-	if err != nil {
-		logger.Error("failed to register metric", zap.Error(err))
-		return err
-	}
 	return nil
 }
 
