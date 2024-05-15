@@ -12,6 +12,9 @@ import (
 var MetricsMap = make(map[string]*prometheus.GaugeVec)
 var GuageMap = make(map[string]prometheus.Gauge)
 
+// Labels for the metrics
+var LabelsMap = make(map[string]map[string]string)
+
 type Metrics struct {
 	MetricList []GpuMetric `yaml:"metrics"`
 }

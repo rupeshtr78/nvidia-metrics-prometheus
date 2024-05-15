@@ -72,6 +72,8 @@ func CreatePrometheusMetrics(filePath string) error {
 
 		// Add the metric to the metrics map
 		MetricsMap[metric.Name] = gaugeVec
+		// Add Labels to the labels map
+		LabelsMap[metric.Name] = metric.Labels
 
 	}
 
