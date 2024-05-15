@@ -52,7 +52,7 @@ func CreatePrometheusMetrics(filePath string) error {
 	var m MetricsV2
 	// 	// read from config/metrics.yaml
 
-	err := utils.LoadFromYAMLV2(filePath, m)
+	err := utils.LoadFromYAMLV2(filePath, &m)
 	if err != nil {
 		logger.Fatal("Failed to read metrics yaml file", zap.String("file", filePath), zap.Error(err))
 		return err

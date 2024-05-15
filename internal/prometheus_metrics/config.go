@@ -61,7 +61,7 @@ func GetLabelsForMetric(metricName string, filePath string) ([]string, error) {
 
 	// read from config/metrics.yaml
 	var m MetricsV2
-	err := utils.LoadFromYAMLV2(filePath, m)
+	err := utils.LoadFromYAMLV2(filePath, &m)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read metrics yaml file %v", filePath)
 	}
