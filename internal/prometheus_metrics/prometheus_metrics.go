@@ -17,7 +17,7 @@ func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 		return nil, err
 	}
 
-	labels, err := utils.GetLabelList(gpuMetric.Labels)
+	labels, err := GetGPuLabels(gpuMetric.Labels)
 	if err != nil {
 		logger.Error("failed to get labels", zap.Error(err))
 		return nil, err
@@ -78,8 +78,4 @@ func CreatePrometheusMetrics(filePath string) error {
 	}
 
 	return nil
-}
-
-func GetLables(labels map[string]string) prometheus.Labels {
-	return prometheus.Labels(labels)
 }

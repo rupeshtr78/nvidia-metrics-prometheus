@@ -8,7 +8,7 @@ import (
 )
 
 // createGauge creates a new gauge with labels and sets the value
-func CreateGauge(name string, labels map[string]string, value float64) error {
+func CreateGauge(name string, labels GpuLabels, value float64) error {
 	// Get the gauge vector from the metrics map
 	// check if the metric exists in prometheus
 	if MetricsMap == nil {
@@ -21,8 +21,15 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 		return fmt.Errorf("failed to find metric: %s", name)
 	}
 
+	// get prometheus labels
+	gpuLabels, err := GetPromtheusLabels(labels)
+	if err != nil {
+		logger.Error("Failed to get prometheues labels", zap.Error(err))
+		return err
+	}
+
 	// If registered, create a new gauge with labels
-	gauge := gaugeVec.With(labels)
+	gauge := gaugeVec.With(gpuLabels)
 	// Set the value
 	gauge.Set(float64(value))
 	// Add the gauge to the gauge map
@@ -33,7 +40,7 @@ func CreateGauge(name string, labels map[string]string, value float64) error {
 }
 
 // SetGaugeMetric sets a gauge metric with the given name, labels, and value.
-func SetGaugeMetric(name string, labels map[string]string, value float64) {
+func SetGaugeMetric(name string, labels GpuLabels, value float64) {
 	err := CreateGauge(name, labels, value)
 	if err != nil {
 		logger.Error("Failed to create gauge metric", zap.String("metric_name", name), zap.Error(err))

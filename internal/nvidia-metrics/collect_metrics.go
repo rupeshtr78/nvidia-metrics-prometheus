@@ -73,7 +73,6 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	if err == nvml.SUCCESS {
 		metrics.GPUTemperature = float64(temperature)
 		gauge.SetGaugeMetric("gpu_temperature", labels, metrics.GPUTemperature)
-
 	}
 
 	utilization, err := handle.GetUtilizationRates()
@@ -99,4 +98,18 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	// Add more metrics here.
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil
+}
+
+func getDeviceTempreture(handle nvml.Device, metrics *GPUDeviceMetrics, metricName string) {
+	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
+
+	labels := map[string]string{
+		"gpu_id":   fmt.Sprintf("%d", metrics.DeviceIndex),
+		"gpu_name": metricName,
+	}
+	if err == nvml.SUCCESS {
+		metrics.GPUTemperature = float64(temperature)
+		gauge.SetGaugeMetric(metricName, labels, metrics.GPUTemperature)
+
+	}
 }
