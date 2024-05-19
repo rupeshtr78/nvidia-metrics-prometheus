@@ -34,3 +34,6 @@ go.work
 modules.xml
 vcs.xml
 /.idea
+
+# vscode
+.vscode/
