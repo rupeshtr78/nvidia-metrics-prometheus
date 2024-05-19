@@ -12,9 +12,6 @@ import (
 var MetricsMap = make(map[string]*prometheus.GaugeVec)
 var GuageMap = make(map[string]prometheus.Gauge)
 
-// Labels for the metrics
-var LabelsMap = make(map[string]map[string]string)
-
 type Metrics struct {
 	MetricList []GpuMetric `yaml:"metrics"`
 }
@@ -38,6 +35,45 @@ type GpuMetricV2 struct {
 }
 
 type GpuLabels map[string]string
+
+// Labels for the metrics
+type LabelsMap map[string]GpuLabels
+
+// Metrics for the GPU
+type MetricMap map[string]*prometheus.GaugeVec
+
+// CreateLabelsMap creates a new LabelsMap
+func CreateLabelsMap() LabelsMap {
+	l := make(LabelsMap)
+	return l
+}
+
+func (l *LabelsMap) AddLabels(metricName string, labels GpuLabels) {
+	(*l)[metricName] = labels
+}
+
+func (l *LabelsMap) GetLabelsFromMap(metricName string) (GpuLabels, error) {
+	if labels, ok := (*l)[metricName]; ok {
+		return labels, nil
+	}
+	return nil, fmt.Errorf("labels %v not found in map", metricName)
+}
+
+func CreateMetricsMap() MetricMap {
+	m := make(MetricMap)
+	return m
+}
+
+func (m *MetricMap) AddMetric(metricName string, metric *prometheus.GaugeVec) {
+	(*m)[metricName] = metric
+}
+
+func (m *MetricMap) GetMetricFromMap(metricName string) (*prometheus.GaugeVec, error) {
+	if metric, ok := (*m)[metricName]; ok {
+		return metric, nil
+	}
+	return nil, fmt.Errorf("metric %v not found in map", metricName)
+}
 
 func LoadFromYAML(yamlFile string) (*Metrics, error) {
 	file, err := os.Open(yamlFile)

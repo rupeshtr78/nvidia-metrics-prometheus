@@ -11,15 +11,22 @@ import (
 func CreateGauge(name string, labels GpuLabels, value float64) error {
 	// Get the gauge vector from the metrics map
 	// check if the metric exists in prometheus
+
 	if MetricsMap == nil {
 		logger.Error("Metrics map is nil")
 		return fmt.Errorf("metrics map is nil")
 	}
 
-	gaugeVec, ok := MetricsMap[name]
-	if !ok {
-		return fmt.Errorf("failed to find metric: %s", name)
+	gaugeVec, err := RegisteredMetrics.GetMetricFromMap(name)
+	if err != nil {
+		logger.Error("Failed to get metric from map", zap.Error(err))
+		return err
 	}
+
+	// gaugeVec, ok := MetricsMap[name]
+	// if !ok {
+	// 	return fmt.Errorf("failed to find metric: %s", name)
+	// }
 
 	// get prometheus labels
 	gpuLabels, err := GetPromtheusLabels(labels)

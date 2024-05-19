@@ -9,6 +9,9 @@ import (
 	"go.uber.org/zap"
 )
 
+var RegisteredMetrics = CreateMetricsMap()
+var RegisteredLabels = CreateLabelsMap()
+
 // NewGaugeVec creates a new gauge vector and registers it with Prometheus.
 func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 	if gpuMetric.Type != "gauge" {
@@ -71,9 +74,13 @@ func CreatePrometheusMetrics(filePath string) error {
 		}
 
 		// Add the metric to the metrics map
-		MetricsMap[metric.Name] = gaugeVec
+
+		RegisteredMetrics.AddMetric(metric.Name, gaugeVec)
+		// metricMap[metric.Name] = gaugeVec
+		// MetricsMap[metric.Name] = gaugeVec
 		// Add Labels to the labels map
-		LabelsMap[metric.Name] = metric.Labels
+
+		RegisteredLabels.AddLabels(metric.Name, metric.Labels)
 
 	}
 
