@@ -15,8 +15,7 @@ type DeviceInfo func(device nvml.Device) (any, nvml.Return)
 type LabelFunctions map[string]DeviceInfo
 
 func NewLabelFunction() LabelFunctions {
-	l := make(LabelFunctions)
-	return l
+	return make(LabelFunctions)
 }
 
 func NewDeviceInfo(f func(device nvml.Device) (any, nvml.Return)) DeviceInfo {
@@ -61,7 +60,7 @@ func GetLabelKeys(metricName string) map[string]string {
 		labelKeys[key] = i
 	}
 
-	logger.Debug("Label keys", zap.Any("label_keys", labelKeys))
+	logger.Debug("Listing Label keys for metric", zap.String("metric_name", metricName), zap.Any("label_keys", labelKeys))
 
 	return labelKeys
 
@@ -79,7 +78,9 @@ func (lm LabelFunctions) AddFunctions() {
 		return device.GetName()
 	}))
 
-	logger.Debug("Label functions", zap.Any("label_functions", lm))
+	for labelName, labelFunc := range labelFunc {
+		logger.Debug("listing label function", zap.String("label_name", labelName), zap.Any("label_func", labelFunc))
+	}
 
 	// add the label function to the map
 
