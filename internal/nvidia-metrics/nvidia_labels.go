@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// DeviceInfo: A function type for retrieving device information.
+// DeviceInfo A function type for retrieving device information.
 type DeviceInfo func(device nvml.Device) (any, nvml.Return)
 
 type LabelFunctions map[string]DeviceInfo
@@ -37,10 +37,10 @@ func (lf *LabelFunctions) AddLabel(labelName string, f DeviceInfo) {
 	(*lf)[labelName] = f
 }
 
-func (lf *LabelFunctions) GetLabelFunc(labelName string) (DeviceInfo, error) {
+func (lf *LabelFunctions) GetLabelFunc(labelName string) (func(device nvml.Device) (any, nvml.Return), error) {
 	if f, ok := (*lf)[labelName]; ok {
 		logger.Debug("Label function found", zap.String("label_name", labelName))
-		return f, nil
+		return f.GetFunction(), nil
 	}
 	return nil, fmt.Errorf("label function not found for label %s", labelName)
 }
@@ -65,7 +65,7 @@ func GetLabelKeys(metricName string) map[string]string {
 		if len(key) == 0 {
 			continue
 		}
-		// adding dummy values for now will be updates while setting guage
+		// adding dummy values for now will be updates while setting gauge
 		labelKeys[key] = i
 	}
 
@@ -75,8 +75,8 @@ func GetLabelKeys(metricName string) map[string]string {
 
 }
 
-// AddLabelFunction adds the label function to the map
-func (lm *LabelFunctions) AddFunctions() {
+// AddFunctions adds the label function to the map
+func (lf *LabelFunctions) AddFunctions() {
 
 	labelFunc := NewLabelFunction()
 	labelFunc.AddLabel(config.GPU_ID.GetLabel(), NewDeviceInfo(func(device nvml.Device) (any, nvml.Return) {
@@ -103,8 +103,7 @@ func (lf *LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName st
 		return err
 	}
 
-	f := labelFunc.GetFunction()
-	value, ret := f(device)
+	value, ret := labelFunc(device)
 	if ret != nvml.SUCCESS {
 		logger.Error("Error fetching label value", zap.String("label_name", labelName))
 		return nil
@@ -114,19 +113,19 @@ func (lf *LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName st
 }
 
 // GetLabelValue returns the label value for the given device and label name
-func (lm *LabelFunctions) GetLabelValue(device nvml.Device, labelName string) string {
+func (lf *LabelFunctions) GetLabelValue(device nvml.Device, labelName string) string {
 	// get the label value
-	value := lm.FetchDeviceLabelValue(device, labelName)
+	value := lf.FetchDeviceLabelValue(device, labelName)
 	return fmt.Sprintf("%v", value)
 }
 
 // GetMetricLabelValues returns all the label values for the given device and metric name
-func (lm *LabelFunctions) GetMetricLabelValues(device nvml.Device, metricName string) map[string]string {
+func (lf *LabelFunctions) GetMetricLabelValues(device nvml.Device, metricName string) map[string]string {
 	labelValues := GetLabelKeys(metricName)
 
 	// iterate over the label functions and get the label values
-	for labelName, _ := range labelValues {
-		labelValues[labelName] = lm.GetLabelValue(device, labelName)
+	for labelName := range labelValues {
+		labelValues[labelName] = lf.GetLabelValue(device, labelName)
 	}
 
 	return labelValues
