@@ -26,6 +26,10 @@ func (d *DeviceInfo) ToString() string {
 	return fmt.Sprintf("%v", d)
 }
 
+func (d *DeviceInfo) GetFunction() func(device nvml.Device) (any, nvml.Return) {
+	return *d
+}
+
 func (lf *LabelFunctions) AddLabel(labelName string, f DeviceInfo) {
 	if lf == nil {
 		logger.Error("Label functions map is nil")
@@ -99,7 +103,8 @@ func (lf *LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName st
 		return err
 	}
 
-	value, ret := labelFunc(device)
+	f := labelFunc.GetFunction()
+	value, ret := f(device)
 	if ret != nvml.SUCCESS {
 		logger.Error("Error fetching label value", zap.String("label_name", labelName))
 		return nil
