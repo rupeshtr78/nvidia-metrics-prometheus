@@ -37,7 +37,7 @@ func (lf LabelFunctions) GetLabelFunc(labelName string) (DeviceInfo, error) {
 	if f, ok := (lf)[labelName]; ok {
 		return f, nil
 	}
-	return nil, fmt.Errorf("label function not found")
+	return nil, fmt.Errorf("label function not found for label %s", labelName)
 }
 
 func (lf LabelFunctions) SetLabelFunc(labelName string, f DeviceInfo) {
@@ -95,8 +95,7 @@ func (lf LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName str
 
 	labelFunc, err := lf.GetLabelFunc(labelName)
 	if err != nil {
-		logger.Error("Error fetching label function", zap.String("label_name", labelName))
-		return nil
+		return err
 	}
 
 	value, ret := labelFunc(device)
