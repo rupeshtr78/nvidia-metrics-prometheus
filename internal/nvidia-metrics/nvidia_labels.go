@@ -14,9 +14,9 @@ type DeviceInfo func(device nvml.Device) (any, nvml.Return)
 
 type LabelFunctions map[string]DeviceInfo
 
-func NewLabelFunction() *LabelFunctions {
+func NewLabelFunction() LabelFunctions {
 	l := make(LabelFunctions)
-	return &l
+	return l
 }
 
 func NewDeviceInfo(f func(device nvml.Device) (any, nvml.Return)) DeviceInfo {
@@ -36,23 +36,6 @@ func (lf LabelFunctions) GetLabelFunc(labelName string) (DeviceInfo, error) {
 
 func (lf LabelFunctions) SetLabelFunc(labelName string, f DeviceInfo) {
 	(lf)[labelName] = f
-}
-
-func (lf LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName string) any {
-
-	labelFunc, err := lf.GetLabelFunc(labelName)
-	if err != nil {
-		logger.Error("Error fetching label function", zap.String("label_name", labelName))
-		return nil
-	}
-
-	value, ret := labelFunc(device)
-	if ret != nvml.SUCCESS {
-		logger.Error("Error fetching label value", zap.String("label_name", labelName))
-		return nil
-	}
-	return value
-
 }
 
 // GetLabelKeys returns the label keys for the given metric name.
@@ -92,6 +75,23 @@ func (lm LabelFunctions) AddFunctions() {
 	}))
 
 	// add the label function to the map
+
+}
+
+func (lf LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName string) any {
+
+	labelFunc, err := lf.GetLabelFunc(labelName)
+	if err != nil {
+		logger.Error("Error fetching label function", zap.String("label_name", labelName))
+		return nil
+	}
+
+	value, ret := labelFunc(device)
+	if ret != nvml.SUCCESS {
+		logger.Error("Error fetching label value", zap.String("label_name", labelName))
+		return nil
+	}
+	return value
 
 }
 
