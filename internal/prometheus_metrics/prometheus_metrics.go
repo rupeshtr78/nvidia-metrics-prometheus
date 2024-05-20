@@ -12,8 +12,8 @@ import (
 var RegisteredMetrics = CreateMetricsMap()
 var RegisteredLabels = CreateLabelsMap()
 
-// NewGaugeVec creates a new gauge vector and registers it with Prometheus.
-func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
+// RegisterMetric NewGaugeVec creates a new gauge vector and registers it with Prometheus.
+func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	if gpuMetric.Type != "gauge" {
 		err := fmt.Errorf("unsupported metric type: %s", gpuMetric.Type)
 		logger.Error("unsupported metric type", zap.String("type", gpuMetric.Type))
@@ -35,7 +35,7 @@ func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 		labels,
 	)
 
-	// Unregister first; if not registered no operations will be performed
+	// Unregister first; if not registered, no operations will be performed
 	if !prometheus.Unregister(gaugeVec) {
 		logger.Warn("metric was already registered", zap.String("metric", gpuMetric.Name))
 	}
@@ -52,7 +52,7 @@ func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 
 // CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
 func CreatePrometheusMetrics(filePath string) error {
-	var m MetricsV2
+	var m Metrics
 	// 	// read from config/metrics.yaml
 
 	err := utils.LoadFromYAMLV2(filePath, &m)

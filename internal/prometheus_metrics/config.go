@@ -16,18 +16,7 @@ type Metrics struct {
 	MetricList []GpuMetric `yaml:"metrics"`
 }
 
-type MetricsV2 struct {
-	MetricList []GpuMetricV2 `yaml:"metrics"`
-}
-
 type GpuMetric struct {
-	Name   string   `yaml:"name"`
-	Help   string   `yaml:"help"`
-	Type   string   `yaml:"type"`
-	Labels []string `yaml:"labels"`
-}
-
-type GpuMetricV2 struct {
 	Name   string    `yaml:"name"`
 	Help   string    `yaml:"help"`
 	Type   string    `yaml:"type"`
@@ -101,7 +90,7 @@ func GetLabelsForMetric(metricName string, filePath string) ([]string, error) {
 	}
 
 	// read from config/metrics.yaml
-	var m MetricsV2
+	var m Metrics
 	err := utils.LoadFromYAMLV2(filePath, &m)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read metrics yaml file %v", filePath)
