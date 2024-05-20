@@ -2,8 +2,8 @@ package nvidiametrics
 
 import (
 	"fmt"
-
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
+	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 	prometheusmetrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
@@ -56,10 +56,10 @@ func (lf *LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName st
 }
 
 // example usage
-func GetLableValue(device nvml.Device, name string) {
+func GetLabelValue(device nvml.Device, name string) {
 
 	labelFunc := NewLabelFunction()
-	labelFunc.AddLabel(string(prometheusmetrics.GPU_ID), NewDeviceInfoRetriever(func(device nvml.Device) (any, nvml.Return) {
+	labelFunc.AddLabel(string(config.GPU_ID), NewDeviceInfoRetriever(func(device nvml.Device) (any, nvml.Return) {
 		return device.GetIndex()
 	}))
 

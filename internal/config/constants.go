@@ -1,4 +1,4 @@
-package prometheusmetrics
+package config
 
 // Metrics
 type Metric string
@@ -18,3 +18,11 @@ const (
 	GPU_ID   Label = "gpu_id"
 	GPU_NAME Label = "gpu_name"
 )
+
+func (m Metric) GetMetric() string {
+	return string(m)
+}
+
+func (l Label) GetLabel() string {
+	return string(l)
+}

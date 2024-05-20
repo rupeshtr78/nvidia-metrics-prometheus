@@ -2,10 +2,9 @@ package nvidiametrics
 
 import (
 	"fmt"
-
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
+	config "github.com/rupeshtr78/nvidia-metrics/internal/config"
 	gauge "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
-	pm "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -70,27 +69,28 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {
 		metrics.GPUTemperature = float64(temperature)
-		gauge.SetGaugeMetric(pm.Label(pm.GPU_TEMPERATURE), labels, metrics.GPUTemperature)
+
+		gauge.SetGaugeMetric(config.GPU_TEMPERATURE.GetMetric(), labels, metrics.GPUTemperature)
 	}
 
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
 		metrics.GPUCPUUtilization = float64(utilization.Gpu)
 		metrics.GPUMemUtilization = float64(utilization.Memory)
-		gauge.SetGaugeMetric(pm.Label(pm.GPU_CPU_UTILIZATION), labels, metrics.GPUCPUUtilization)
-		gauge.SetGaugeMetric(pm.Label(pm.GPU_MEM_UTILIZATION), labels, metrics.GPUMemUtilization)
+		gauge.SetGaugeMetric(config.GPU_CPU_UTILIZATION.GetMetric(), labels, metrics.GPUCPUUtilization)
+		gauge.SetGaugeMetric(config.GPU_MEM_UTILIZATION.GetMetric(), labels, metrics.GPUMemUtilization)
 	}
 
 	gpuPowerUsage, err := handle.GetPowerUsage()
 	if err == nvml.SUCCESS {
 		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
-		gauge.SetGaugeMetric(pm.Label(pm.GPU_POWER_USAGE), labels, metrics.GPUPowerUsage)
+		gauge.SetGaugeMetric(config.GPU_POWER_USAGE.GetMetric(), labels, metrics.GPUPowerUsage)
 	}
 
 	runningProcess, err := handle.GetComputeRunningProcesses()
 	if err == nvml.SUCCESS {
 		metrics.GPURunningProcesses = len(runningProcess)
-		gauge.SetGaugeMetric(pm.Label(pm.GPU_RUNNING_PROCESS), labels, float64(metrics.GPURunningProcesses))
+		gauge.SetGaugeMetric(config.GPU_RUNNING_PROCESS.GetMetric(), labels, float64(metrics.GPURunningProcesses))
 	}
 
 	// Add more metrics here.
