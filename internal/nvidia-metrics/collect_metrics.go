@@ -3,7 +3,7 @@ package nvidiametrics
 import (
 	"fmt"
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
-	config "github.com/rupeshtr78/nvidia-metrics/internal/config"
+	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 	gauge "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
@@ -17,7 +17,7 @@ func CollectGpuMetrics() {
 		return
 	}
 
-	for i := 0; i < int(deviceCount); i++ {
+	for i := 0; i < deviceCount; i++ {
 		metrics, err := collectDeviceMetrics(i)
 		if err != nil {
 			logger.Error(
@@ -28,7 +28,7 @@ func CollectGpuMetrics() {
 			continue // Skip this GPU and proceed with the next one
 		}
 		// Use the collected metrics if needed
-		// Replace this with actual usage.
+		// To Replace this with actual usage.
 		_ = metrics
 	}
 
@@ -66,6 +66,8 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		"gpu_name": deviceName,
 	}
 
+	labelManager := NewLabelFunction()
+
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {
 		metrics.GPUTemperature = float64(temperature)
@@ -75,10 +77,15 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
+		metricCpu := config.GPU_CPU_UTILIZATION.GetMetric()
+		metricCpuLabels := labelManager.GetMetricLabelValues(handle, metricCpu)
 		metrics.GPUCPUUtilization = float64(utilization.Gpu)
+
+		metricMem := config.GPU_MEM_UTILIZATION.GetMetric()
+		metricMemLabels := labelManager.GetMetricLabelValues(handle, metricMem)
 		metrics.GPUMemUtilization = float64(utilization.Memory)
-		gauge.SetGaugeMetric(config.GPU_CPU_UTILIZATION.GetMetric(), labels, metrics.GPUCPUUtilization)
-		gauge.SetGaugeMetric(config.GPU_MEM_UTILIZATION.GetMetric(), labels, metrics.GPUMemUtilization)
+		gauge.SetGaugeMetric(metricCpu, metricCpuLabels, metrics.GPUCPUUtilization)
+		gauge.SetGaugeMetric(config.GPU_MEM_UTILIZATION.GetMetric(), metricMemLabels, metrics.GPUMemUtilization)
 	}
 
 	gpuPowerUsage, err := handle.GetPowerUsage()
