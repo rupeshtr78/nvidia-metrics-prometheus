@@ -69,27 +69,27 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {
 		metrics.GPUTemperature = float64(temperature)
-		gauge.SetGaugeMetric("gpu_temperature", labels, metrics.GPUTemperature)
+		gauge.SetGaugeMetric(gpu_temperature, labels, metrics.GPUTemperature)
 	}
 
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
 		metrics.GPUCPUUtilization = float64(utilization.Gpu)
 		metrics.GPUMemUtilization = float64(utilization.Memory)
-		gauge.SetGaugeMetric("gpu_cpu_utilization", labels, metrics.GPUCPUUtilization)
-		gauge.SetGaugeMetric("gpu_mem_utilization", labels, metrics.GPUMemUtilization)
+		gauge.SetGaugeMetric(gpu_cpu_utilization, labels, metrics.GPUCPUUtilization)
+		gauge.SetGaugeMetric(gpu_mem_utilization, labels, metrics.GPUMemUtilization)
 	}
 
 	gpuPowerUsage, err := handle.GetPowerUsage()
 	if err == nvml.SUCCESS {
 		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
-		gauge.SetGaugeMetric("gpu_power_usage", labels, metrics.GPUPowerUsage)
+		gauge.SetGaugeMetric(gpu_power_usage, labels, metrics.GPUPowerUsage)
 	}
 
 	runningProcess, err := handle.GetComputeRunningProcesses()
 	if err == nvml.SUCCESS {
 		metrics.GPURunningProcesses = len(runningProcess)
-		gauge.SetGaugeMetric("gpu_running_process", labels, float64(metrics.GPURunningProcesses))
+		gauge.SetGaugeMetric(gpu_running_process, labels, float64(metrics.GPURunningProcesses))
 	}
 
 	// Add more metrics here.
