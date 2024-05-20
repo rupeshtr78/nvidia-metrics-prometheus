@@ -22,6 +22,10 @@ func NewDeviceInfo(f func(device nvml.Device) (any, nvml.Return)) DeviceInfo {
 	return f
 }
 
+func (d DeviceInfo) ToString() string {
+	return fmt.Sprintf("%v", d)
+}
+
 func (lf LabelFunctions) AddLabel(labelName string, f DeviceInfo) {
 	if lf == nil {
 		logger.Error("Label functions map is nil")
@@ -79,13 +83,14 @@ func (lm LabelFunctions) AddFunctions() {
 	}))
 
 	for labelName, labelFunc := range labelFunc {
-		logger.Debug("listing label function", zap.String("label_name", labelName), zap.Any("label_func", labelFunc))
+		logger.Debug("listing label function", zap.String("label_name", labelName), zap.String("label_func", labelFunc.ToString()))
 	}
 
 	// add the label function to the map
 
 }
 
+// FetchDeviceLabelValue fetches the label value for the given device and label name
 func (lf LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName string) any {
 
 	labelFunc, err := lf.GetLabelFunc(labelName)
@@ -103,12 +108,14 @@ func (lf LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName str
 
 }
 
+// GetLabelValue returns the label value for the given device and label name
 func (lm LabelFunctions) GetLabelValue(device nvml.Device, labelName string) string {
 	// get the label value
 	value := lm.FetchDeviceLabelValue(device, labelName)
 	return fmt.Sprintf("%v", value)
 }
 
+// GetMetricLabelValues returns all the label values for the given device and metric name
 func (lm LabelFunctions) GetMetricLabelValues(device nvml.Device, metricName string) map[string]string {
 	labelValues := GetLabelKeys(metricName)
 
