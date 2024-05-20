@@ -16,21 +16,6 @@ type GPUDeviceMetrics struct {
 	GPURunningProcesses int
 }
 
-// Metrics
-const (
-	gpu_cpu_utilization = "gpu_cpu_utilization"
-	gpu_mem_utilization = "gpu_mem_utilization"
-	gpu_power_usage     = "gpu_power_usage"
-	gpu_running_process = "gpu_running_process"
-	gpu_temperature     = "gpu_temperature"
-)
-
-// Labels
-const (
-	gpu_id   = "gpu_id"
-	gpu_name = "gpu_name"
-)
-
 // InitNVML initializes the NVML library.
 func InitNVML() {
 	if err := nvml.Init(); err != nvml.SUCCESS {

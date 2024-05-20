@@ -59,7 +59,7 @@ func (lf *LabelFunctions) FetchDeviceLabelValue(device nvml.Device, labelName st
 func GetLableValue(device nvml.Device, name string) {
 
 	labelFunc := NewLabelFunction()
-	labelFunc.AddLabel(gpu_id, NewDeviceInfoRetriever(func(device nvml.Device) (any, nvml.Return) {
+	labelFunc.AddLabel(string(prometheusmetrics.GPU_ID), NewDeviceInfoRetriever(func(device nvml.Device) (any, nvml.Return) {
 		return device.GetIndex()
 	}))
 
@@ -92,18 +92,3 @@ func GetLabelKeys(metricName string) map[string]string {
 	return labelKeys
 
 }
-
-// Metrics
-const (
-	gpu_cpu_utilization = "gpu_cpu_utilization"
-	gpu_mem_utilization = "gpu_mem_utilization"
-	gpu_power_usage     = "gpu_power_usage"
-	gpu_running_process = "gpu_running_process"
-	gpu_temperature     = "gpu_temperature"
-)
-
-// Labels
-const (
-	gpu_id   = "gpu_id"
-	gpu_name = "gpu_name"
-)
