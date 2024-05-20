@@ -40,5 +40,13 @@ func RunMetricsLocal() {
 	for {
 		nvidiametrics.CollectGpuMetrics()
 		time.Sleep(30 * time.Second)
+		for key, label := range prometheusmetrics.RegisteredLabels {
+			logger.Debug("Registered label", zap.String("key", key), zap.Any("label", label))
+		}
+		// "key":"gpu_power_usage","label":{"label1":"gpu_id","label2":"gpu_name"}}
+
 	}
+
+	// get all labels for debugging
+
 }

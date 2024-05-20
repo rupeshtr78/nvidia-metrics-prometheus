@@ -9,16 +9,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// GPUDeviceMetrics represents the collected metrics for a GPU device.
-type GPUDeviceMetrics struct {
-	DeviceIndex         int
-	GPUTemperature      float64
-	GPUCPUUtilization   float64
-	GPUMemUtilization   float64
-	GPUPowerUsage       float64
-	GPURunningProcesses int
-}
-
 // CollectGpuMetrics collects metrics for all the GPUs.
 func CollectGpuMetrics() {
 	deviceCount, err := nvml.DeviceGetCount()
@@ -60,6 +50,13 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		return nil, err
 	}
 
+	logger.Debug(
+		"Collected device info",
+		zap.Int("device_index", deviceIndex),
+		zap.String("device_name", deviceName),
+		// zap.Int("pci_bus_id", int(pciInfo.)),
+	)
+
 	metrics := &GPUDeviceMetrics{
 		DeviceIndex: deviceIndex,
 	}
@@ -99,3 +96,53 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil
 }
+
+// func GetNvidiaLabels(handle nvml.Device) {
+
+// handle.GetPciInfo()
+// handle.GetTemperatureThreshold(nvml.TEMPERATURE_THRESHOLD_SLOWDOWN)
+// 	handle.GetTemperatureThreshold(nvml.TEMPERATURE_THRESHOLD_SHUTDOWN)
+// 	handle.GetClockInfo(nvml.CLOCK_GRAPHICS)
+// 	handle.GetClockInfo(nvml.CLOCK_SM)
+// 	handle.GetClockInfo(nvml.CLOCK_MEM)
+// 	handle.GetClockInfo(nvml.CLOCK_VIDEO)
+// 	handle.GetClockInfo(nvml.CLOCK_COUNT)
+// 	handle.GetSupportedVgpus()
+// 	handle.GetVgpuMetadata()
+// 	handle.GetVgpuUtilization()
+// 	handle.GetVgpuProcessUtilization()
+// 	handle.GetAttributes()
+// 	handle.GetEncoderCapacity()
+// 	handle.GetEncoderStats()
+// 	handle.GetActiveVgpus()
+// 	handle.GetComputeMode()
+// 	handle.GetEccMode()
+// 	handle.GetTotalEccErrors()
+// 	handle.GetDetailedEccErrors()
+// 	handle.GetMemoryErrorCounter()
+// 	handle.GetVbiosVersion()
+// 	handle.GetBridgeChipInfo()
+// 	handle.GetInforomVersion(nvml.INFOROM_OEM)
+// 	handle.GetInforomVersion(nvml.INFOROM_ECC)
+// 	handle.GetInforomVersion(nvml.INFOROM_POWER)
+// 	handle.GetInforomVersion(nvml.INFOROM_COUNT)
+// 	handle.GetInforomImageVersion()
+// 	handle.GetMaxClockInfo(nvml.CLOCK_GRAPHICS)
+// 	handle.GetMaxClockInfo(nvml.CLOCK_SM)
+// 	handle.GetMaxClockInfo(nvml.CLOCK_MEM)
+// 	handle.GetMaxClockInfo(nvml.CLOCK_VIDEO)
+// 	handle.GetMaxClockInfo(nvml.CLOCK_COUNT)
+// 	handle.GetApplicationsClock(nvml.CLOCK_GRAPHICS)
+// 	handle.GetApplicationsClock(nvml.CLOCK_SM)
+// 	handle.GetApplicationsClock(nvml.CLOCK_MEM)
+// 	handle.GetApplicationsClock(nvml.CLOCK_VIDEO)
+// 	handle.GetApplicationsClock(nvml.CLOCK_COUNT)
+// 	handle.GetDefaultApplicationsClock(nvml.CLOCK_GRAPHICS)
+// 	handle.GetDefaultApplicationsClock(nvml.CLOCK_SM)
+// 	handle.GetDefaultApplicationsClock(nvml.CLOCK_MEM)
+// 	handle.GetDefaultApplicationsClock(nvml.CLOCK_VIDEO)
+// 	handle.GetDefaultApplicationsClock(nvml.CLOCK_COUNT)
+// 	handle.GetCudaComputeCapability()
+// 	handle.GetNvLinkCapability()
+// 	handle.GetNvLinkRemotePciInfo()
+// }

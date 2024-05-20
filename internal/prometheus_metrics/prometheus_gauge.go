@@ -23,11 +23,6 @@ func CreateGauge(name string, labels GpuLabels, value float64) error {
 		return err
 	}
 
-	// gaugeVec, ok := MetricsMap[name]
-	// if !ok {
-	// 	return fmt.Errorf("failed to find metric: %s", name)
-	// }
-
 	// get prometheus labels
 	gpuLabels, err := GetPromtheusLabels(labels)
 	if err != nil {
