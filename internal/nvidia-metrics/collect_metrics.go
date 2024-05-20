@@ -67,6 +67,7 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	}
 
 	labelManager := NewLabelFunction()
+	labelManager.AddFunctions()
 
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {

@@ -80,7 +80,7 @@ func GetLabelKeys(metricName string) map[string]string {
 }
 
 // AddLabelFunction adds the label function to the map
-func (lm LabelFunctions) AddFunction() {
+func (lm LabelFunctions) AddFunctions() {
 
 	labelFunc := NewLabelFunction()
 	labelFunc.AddLabel(config.GPU_ID.GetLabel(), NewDeviceInfo(func(device nvml.Device) (any, nvml.Return) {
