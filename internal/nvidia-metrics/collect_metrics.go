@@ -9,6 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
+var labelManager = NewLabelFunction()
+
 // CollectGpuMetrics collects metrics for all the GPUs.
 func CollectGpuMetrics() {
 	deviceCount, err := nvml.DeviceGetCount()
@@ -66,7 +68,6 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		"gpu_name": deviceName,
 	}
 
-	labelManager := NewLabelFunction()
 	labelManager.AddFunctions()
 
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
