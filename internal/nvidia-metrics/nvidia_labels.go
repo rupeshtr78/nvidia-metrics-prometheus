@@ -22,7 +22,7 @@ func NewDeviceInfo(f func(device nvml.Device) (any, nvml.Return)) DeviceInfo {
 	return f
 }
 
-func (d DeviceInfo) ToString() string {
+func (d *DeviceInfo) ToString() string {
 	return fmt.Sprintf("%v", d)
 }
 
