@@ -51,7 +51,7 @@ func GetLabelsForMetric(metricName string, filePath string) ([]string, error) {
 
 	// get labels for the metric
 	for _, metric := range m.MetricList {
-		if metric.Name == metricName {
+		if metric.Name.GetMetric() == metricName {
 			labels, err := GetGPuLabels(metric.Labels)
 			if err != nil {
 				return nil, fmt.Errorf("failed to get labels %v", err)

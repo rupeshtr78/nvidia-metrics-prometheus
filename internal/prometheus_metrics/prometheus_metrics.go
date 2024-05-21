@@ -29,7 +29,7 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	// Create a new gauge vector
 	gaugeVec := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: gpuMetric.Name,
+			Name: gpuMetric.Name.GetMetric(),
 			Help: gpuMetric.Help,
 		},
 		labels,
@@ -37,7 +37,7 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 
 	// Unregister first; if not registered, no operations will be performed
 	if !prometheus.Unregister(gaugeVec) {
-		logger.Warn("metric was already registered", zap.String("metric", gpuMetric.Name))
+		logger.Warn("metric was already registered", zap.String("metric", gpuMetric.Name.GetMetric()))
 	}
 
 	err = prometheus.Register(gaugeVec)
@@ -46,7 +46,7 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 		return nil, err
 	}
 
-	logger.Info("Verified registration of", zap.String("metric", gpuMetric.Name))
+	logger.Info("Verified registration of", zap.String("metric", gpuMetric.Name.GetMetric()))
 	return gaugeVec, nil
 }
 
@@ -75,12 +75,12 @@ func CreatePrometheusMetrics(filePath string) error {
 
 		// Add the metric to the metrics map
 
-		RegisteredMetrics.AddMetric(metric.Name, gaugeVec)
+		RegisteredMetrics.AddMetric(metric.Name.GetMetric(), gaugeVec)
 		// metricMap[metric.Name] = gaugeVec
 		// MetricsMap[metric.Name] = gaugeVec
 		// Add Labels to the labels map
 
-		RegisteredLabels.AddLabels(metric.Name, metric.Labels)
+		RegisteredLabels.AddLabels(metric.Name.GetMetric(), metric.Labels)
 
 	}
 
