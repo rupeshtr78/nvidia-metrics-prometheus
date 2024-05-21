@@ -9,15 +9,18 @@ import (
 	"go.uber.org/zap"
 )
 
-// NewGaugeVec creates a new gauge vector and registers it with Prometheus.
-func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
+var RegisteredMetrics = CreateMetricsMap()
+var RegisteredLabels = CreateLabelsMap()
+
+// RegisterMetric NewGaugeVec creates a new gauge vector and registers it with Prometheus.
+func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	if gpuMetric.Type != "gauge" {
 		err := fmt.Errorf("unsupported metric type: %s", gpuMetric.Type)
 		logger.Error("unsupported metric type", zap.String("type", gpuMetric.Type))
 		return nil, err
 	}
 
-	labels, err := utils.GetLabelList(gpuMetric.Labels)
+	labels, err := GetGPuLabels(gpuMetric.Labels)
 	if err != nil {
 		logger.Error("failed to get labels", zap.Error(err))
 		return nil, err
@@ -32,7 +35,7 @@ func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 		labels,
 	)
 
-	// Unregister first; if not registered no operations will be performed
+	// Unregister first; if not registered, no operations will be performed
 	if !prometheus.Unregister(gaugeVec) {
 		logger.Warn("metric was already registered", zap.String("metric", gpuMetric.Name))
 	}
@@ -49,7 +52,7 @@ func RegisterMetric(gpuMetric GpuMetricV2) (*prometheus.GaugeVec, error) {
 
 // CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
 func CreatePrometheusMetrics(filePath string) error {
-	var m MetricsV2
+	var m Metrics
 	// 	// read from config/metrics.yaml
 
 	err := utils.LoadFromYAMLV2(filePath, &m)
@@ -71,13 +74,15 @@ func CreatePrometheusMetrics(filePath string) error {
 		}
 
 		// Add the metric to the metrics map
-		MetricsMap[metric.Name] = gaugeVec
+
+		RegisteredMetrics.AddMetric(metric.Name, gaugeVec)
+		// metricMap[metric.Name] = gaugeVec
+		// MetricsMap[metric.Name] = gaugeVec
+		// Add Labels to the labels map
+
+		RegisteredLabels.AddLabels(metric.Name, metric.Labels)
 
 	}
 
 	return nil
-}
-
-func GetLables(labels map[string]string) prometheus.Labels {
-	return prometheus.Labels(labels)
 }
