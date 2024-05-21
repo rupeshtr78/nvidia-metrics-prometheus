@@ -33,7 +33,7 @@ func CreateGauge(name string, labels GpuLabels, value float64) error {
 	// If registered, create a new gauge with labels
 	gauge := gaugeVec.With(gpuLabels)
 	// Set the value
-	gauge.Set(float64(value))
+	gauge.Set(value)
 
 	logger.Debug("Created the gauge", zap.String("name", string(name)), zap.Any("labels", labels), zap.Float64("value", value))
 

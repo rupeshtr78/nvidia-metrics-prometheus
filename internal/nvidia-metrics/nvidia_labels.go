@@ -83,12 +83,9 @@ func (lf LabelFunctions) AddFunctions() {
 	})
 
 	lf.Add(config.GPU_NAME.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
-		return device.GetName()
+		name, ret := device.GetName()
+		return name, ret
 	})
-
-	for labelName, labelFunc := range lf {
-		logger.Debug("listing label function", zap.String("label_name", labelName), zap.String("label_func", labelFunc.ToString()))
-	}
 
 	// add the label function to the map
 
