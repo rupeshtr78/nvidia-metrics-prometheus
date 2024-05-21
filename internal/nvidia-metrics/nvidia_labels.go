@@ -30,7 +30,7 @@ func (d *DeviceInfo) GetFunction() func(device nvml.Device) (any, nvml.Return) {
 	return *d
 }
 
-func (lf *LabelFunctions) AddLabel(labelName string, f DeviceInfo) {
+func (lf *LabelFunctions) Add(labelName string, f DeviceInfo) {
 	if lf == nil {
 		logger.Error("Label functions map is nil")
 	}
@@ -81,11 +81,12 @@ func GetLabelKeys(metricName string) map[string]string {
 func (lf *LabelFunctions) AddFunctions() {
 
 	labelFunc := NewLabelFunction()
-	labelFunc.AddLabel(config.GPU_ID.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
-		return device.GetIndex()
+	labelFunc.Add(config.GPU_ID.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		index, ret := device.GetIndex()
+		return index, ret
 	})
 
-	labelFunc.AddLabel(config.GPU_NAME.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+	labelFunc.Add(config.GPU_NAME.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 		return device.GetName()
 	})
 
