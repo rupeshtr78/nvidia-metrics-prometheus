@@ -38,6 +38,10 @@ func (lf *LabelFunctions) AddLabel(labelName string, f DeviceInfo) {
 }
 
 func (lf *LabelFunctions) GetLabelFunc(labelName string) (func(device nvml.Device) (any, nvml.Return), error) {
+	if lf == nil {
+		return nil, fmt.Errorf("label function map empty") // TODO: return error)
+	}
+
 	if f, ok := (*lf)[labelName]; ok {
 		logger.Debug("Label function found", zap.String("label_name", labelName))
 		return f.GetFunction(), nil
