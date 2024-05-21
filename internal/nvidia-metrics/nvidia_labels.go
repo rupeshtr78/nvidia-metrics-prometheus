@@ -69,8 +69,6 @@ func GetLabelKeys(metricName string) map[string]string {
 		labelKeys[key] = i
 	}
 
-	logger.Debug("Listing Label keys for metric", zap.String("metric_name", metricName), zap.Any("label_keys", labelKeys))
-
 	return labelKeys
 
 }
@@ -79,13 +77,13 @@ func GetLabelKeys(metricName string) map[string]string {
 func (lf *LabelFunctions) AddFunctions() {
 
 	labelFunc := NewLabelFunction()
-	labelFunc.AddLabel(config.GPU_ID.GetLabel(), NewDeviceInfo(func(device nvml.Device) (any, nvml.Return) {
+	labelFunc.AddLabel(config.GPU_ID.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 		return device.GetIndex()
-	}))
+	})
 
-	labelFunc.AddLabel(config.GPU_NAME.GetLabel(), NewDeviceInfo(func(device nvml.Device) (any, nvml.Return) {
+	labelFunc.AddLabel(config.GPU_NAME.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 		return device.GetName()
-	}))
+	})
 
 	for labelName, labelFunc := range labelFunc {
 		logger.Debug("listing label function", zap.String("label_name", labelName), zap.String("label_func", labelFunc.ToString()))
