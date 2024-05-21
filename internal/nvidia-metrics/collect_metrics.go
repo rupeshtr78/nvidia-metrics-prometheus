@@ -2,6 +2,7 @@ package nvidiametrics
 
 import (
 	"fmt"
+
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
 	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 	gauge "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
@@ -116,4 +117,15 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	// Add more metrics here.
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil
+}
+
+func updateUtilizationMetrics(handle nvml.Device, utilization nvml.Utilization) {
+	updateMetric(config.GPU_CPU_UTILIZATION, handle, float64(utilization.Gpu))
+	updateMetric(config.GPU_MEM_UTILIZATION, handle, float64(utilization.Memory))
+}
+
+func updateMetric(m config.Metric, handle nvml.Device, value float64) {
+	metric := m.GetMetric()
+	labels := labelManager.GetMetricLabelValues(handle, metric)
+	gauge.SetGaugeMetric(metric, labels, value)
 }
