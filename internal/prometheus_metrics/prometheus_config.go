@@ -5,9 +5,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var MetricsMap = make(map[string]*prometheus.GaugeVec)
-var GuageMap = make(map[string]prometheus.Gauge)
-
 type Metrics struct {
 	MetricList []GpuMetric `yaml:"metrics"`
 }

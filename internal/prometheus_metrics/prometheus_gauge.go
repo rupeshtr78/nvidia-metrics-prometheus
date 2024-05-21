@@ -12,7 +12,7 @@ func CreateGauge(name string, labels GpuLabels, value float64) error {
 	// Get the gauge vector from the metrics map
 	// check if the metric exists in prometheus
 
-	if MetricsMap == nil {
+	if RegisteredMetrics == nil {
 		logger.Error("Metrics map is nil")
 		return fmt.Errorf("metrics map is nil")
 	}

@@ -33,7 +33,7 @@ func GetPromtheusLabels(labels GpuLabels) (prometheus.Labels, error) {
 func GetLabelsForMetric(metricName string, filePath string) ([]string, error) {
 
 	// check if the metric exists in prometheus
-	if _, ok := MetricsMap[metricName]; !ok {
+	if _, ok := RegisteredMetrics[metricName]; !ok {
 		return nil, fmt.Errorf("metric %v not registered", metricName)
 	}
 
