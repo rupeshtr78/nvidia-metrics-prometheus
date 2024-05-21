@@ -26,7 +26,8 @@ func main() {
 	}
 	//
 	//// run the metrics server
-	api.RunMetrics()
+	//api.RunMetrics()
+	api.RunPrometheusMetricsServer()
 	//// RunMetricsLocal()
 
 }
