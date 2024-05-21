@@ -90,6 +90,17 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		gauge.SetGaugeMetric(config.GPU_MEM_UTILIZATION.GetMetric(), metricMemLabels, metrics.GPUMemUtilization)
 	}
 
+	//memoryInfo, err := handle.GetMemoryInfo()
+	//if err == nvml.SUCCESS {
+	//	// Memory usage is in bytes, converting to GB.
+	//	metrics.GPUMemoryUsed = float64(memoryInfo.Used) / 1024 / 1024 / 1024
+	//	metrics.GPUMemoryTotal = float64(memoryInfo.Total) / 1024 / 1024 / 1024
+	//	metrics.GPUMemoryFree = float64(memoryInfo.Free) / 1024 / 1024 / 1024
+	//	gauge.SetGaugeMetric(config.GPU_MEMORY_USED.GetMetric(), labels, metrics.GPUMemoryUsed)
+	//	gauge.SetGaugeMetric(config.GPU_MEMORY_TOTAL.GetMetric(), labels, metrics.GPUMemoryTotal)
+	//	gauge.SetGaugeMetric(config.GPU_MEMORY_FREE.GetMetric(), labels, metrics.GPUMemoryFree)
+	//}
+
 	gpuPowerUsage, err := handle.GetPowerUsage()
 	if err == nvml.SUCCESS {
 		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
