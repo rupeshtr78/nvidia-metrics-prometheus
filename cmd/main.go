@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/rupeshtr78/nvidia-metrics/api"
 	"os"
 	"time"
 
-	"github.com/rupeshtr78/nvidia-metrics/api"
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
 	prometheusmetrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
@@ -24,10 +24,11 @@ func main() {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)
 	}
-
-	// run the metrics server
-	api.RunMetrics()
-	// RunMetricsLocal()
+	//
+	//// run the metrics server
+	//api.RunMetrics()
+	api.RunPrometheusMetricsServer()
+	//// RunMetricsLocal()
 
 }
 

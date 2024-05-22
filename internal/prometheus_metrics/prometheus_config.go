@@ -3,20 +3,18 @@ package prometheusmetrics
 import (
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 )
-
-var MetricsMap = make(map[string]*prometheus.GaugeVec)
-var GuageMap = make(map[string]prometheus.Gauge)
 
 type Metrics struct {
 	MetricList []GpuMetric `yaml:"metrics"`
 }
 
 type GpuMetric struct {
-	Name   string    `yaml:"name"`
-	Help   string    `yaml:"help"`
-	Type   string    `yaml:"type"`
-	Labels GpuLabels `yaml:"labels"` // {label1: gpu_id, label2: gpu_name}
+	Name   config.Metric `yaml:"name"`
+	Help   string        `yaml:"help"`
+	Type   string        `yaml:"type"`
+	Labels GpuLabels     `yaml:"labels"` // {label1: gpu_id, label2: gpu_name}
 }
 
 type GpuLabels map[string]string
