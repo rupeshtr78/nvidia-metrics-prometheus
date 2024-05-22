@@ -19,8 +19,9 @@ type Label string
 
 // Labels
 const (
-	GPU_ID   Label = "gpu_id"
-	GPU_NAME Label = "gpu_name"
+	GPU_ID            Label = "gpu_id"
+	GPU_NAME          Label = "gpu_name"
+	GPU_TEM_THRESHOLD Label = "gpu_temperature_threshold"
 )
 
 func (m Metric) GetMetric() string {

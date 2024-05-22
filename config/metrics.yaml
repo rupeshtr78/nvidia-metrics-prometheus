@@ -31,6 +31,7 @@ metrics:
     labels:
       label1: gpu_id
       label2: gpu_name
+      label3: gpu_temperature_threshold
 
   - name: gpu_power_usage
     type: gauge
