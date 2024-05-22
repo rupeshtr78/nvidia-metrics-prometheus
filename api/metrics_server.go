@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
+	nvidiaMetrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -22,8 +22,8 @@ var (
 
 func RunPrometheusMetricsServer() {
 	// Initialize NVML before starting the metric collection loop
-	nvidiametrics.InitNVML()
-	defer nvidiametrics.ShutdownNVML()
+	nvidiaMetrics.InitNVML()
+	defer nvidiaMetrics.ShutdownNVML()
 
 	// Start collecting GPU metrics every 5 seconds
 	startMetricsCollection(5 * time.Second)
@@ -40,14 +40,13 @@ func startMetricsCollection(interval time.Duration) {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 		for range ticker.C {
-			nvidiametrics.CollectGpuMetrics()
+			nvidiaMetrics.CollectGpuMetrics()
 			opsProcessed.Inc()
 		}
 	}()
 }
 
 func StartPrometheusServer() error {
-
 	server := &http.Server{
 		Addr:         ":9500",
 		ReadTimeout:  10 * time.Second,
@@ -55,21 +54,26 @@ func StartPrometheusServer() error {
 		Handler:      promhttp.Handler(),
 	}
 
+	logger.Info("Starting Prometheus server on port 9500")
+
 	err := server.ListenAndServe()
+
 	return err
+
 }
 
+// RunMetrics starts HTTP server on port 9500 to expose GPU metrics [Deprecated]
 func RunMetrics() {
 	// Initialize NVML before starting the metric collection loop
-	nvidiametrics.InitNVML()
-	defer nvidiametrics.ShutdownNVML()
+	nvidiaMetrics.InitNVML()
+	defer nvidiaMetrics.ShutdownNVML()
 
 	http.Handle("/metrics", promhttp.Handler())
 
 	// Start a separate goroutine for collecting metrics at regular intervals
 	go func() {
 		for {
-			nvidiametrics.CollectGpuMetrics()
+			nvidiaMetrics.CollectGpuMetrics()
 			time.Sleep(5 * time.Second)
 		}
 	}()
