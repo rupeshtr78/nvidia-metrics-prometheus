@@ -1,5 +1,5 @@
 metrics:
-  - name: gpu_id
+  - name: gpu_id_metric
     type: gauge
     help: "ID of the GPU."
     labels:

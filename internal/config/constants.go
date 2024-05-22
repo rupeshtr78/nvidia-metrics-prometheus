@@ -4,7 +4,7 @@ package config
 type Metric string
 
 const (
-	GPU_ID_METRIC       Metric = "gpu_id"
+	GPU_ID_METRIC       Metric = "gpu_id_metric"
 	GPU_GPU_UTILIZATION Metric = "gpu_gpu_utilization"
 	GPU_MEM_UTILIZATION Metric = "gpu_mem_utilization"
 	GPU_POWER_USAGE     Metric = "gpu_power_usage"
