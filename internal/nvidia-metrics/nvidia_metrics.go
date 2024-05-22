@@ -5,11 +5,25 @@ import (
 	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 )
 
+// GPUDeviceMetrics represents the collected metrics for a GPU device.
+type GPUDeviceMetrics struct {
+	DeviceIndex         int
+	GPUTemperature      float64
+	GPUCPUUtilization   float64
+	GPUMemUtilization   float64
+	GPUPowerUsage       float64
+	GPURunningProcesses int
+	GPUMemoryUsed       uint64
+	GPUMemoryTotal      uint64
+	GPUMemoryFree       uint64
+	GpuPState           int32
+}
+
 func CollectUtilizationMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
 		metrics.GPUCPUUtilization = float64(utilization.Gpu)
-		SetDeviceMetric(handle, config.GPU_CPU_UTILIZATION, metrics.GPUCPUUtilization)
+		SetDeviceMetric(handle, config.GPU_GPU_UTILIZATION, metrics.GPUCPUUtilization)
 
 		metrics.GPUMemUtilization = float64(utilization.Memory)
 		SetDeviceMetric(handle, config.GPU_MEM_UTILIZATION, metrics.GPUMemUtilization)
@@ -22,7 +36,7 @@ func CollectMemoryInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvm
 	memoryInfo, err := handle.GetMemoryInfo()
 	if err == nvml.SUCCESS {
 		// Memory usage is in bytes, converting to GB.
-		metrics.GPUMemoryUsed = uint64(memoryInfo.Used) / 1024 / 1024 / 1024
+		metrics.GPUMemoryUsed = uint64(memoryInfo.Used) / 1024 / 1024 //  memory is in bytes and we want MB
 		metrics.GPUMemoryTotal = uint64(memoryInfo.Total) / 1024 / 1024 / 1024
 		metrics.GPUMemoryFree = uint64(memoryInfo.Free) / 1024 / 1024 / 1024
 
@@ -74,20 +88,19 @@ func CollectDeviceIdAsMetric(handle nvml.Device, metrics *GPUDeviceMetrics, metr
 	return err
 }
 
-// @TODO added as label remove if not needed
-func CollectTempThresholdShutdownAsMetric(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	metricValue, err := handle.GetTemperatureThreshold(nvml.TEMPERATURE_THRESHOLD_SHUTDOWN)
+// P0/P1 - Maximum 3D performance
+// P2/P3 - Balanced 3D performance-power
+// P8 - Basic HD video playback
+// P10 - DVD playback
+// P12 - Minimum idle power consumption
+// PState is the current performance state of the GPU device.
+func collectPStateMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	pState, err := handle.GetPerformanceState()
 	if err == nvml.SUCCESS {
-		SetDeviceMetric(handle, metric, float64(metricValue))
-	}
-	return err
-}
-
-func CollectClock(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	metricValue, err := handle.GetClock(nvml.CLOCK_MEM, nvml.CLOCK_ID_CURRENT)
-	if err == nvml.SUCCESS {
-		SetDeviceMetric(handle, metric, float64(metricValue))
+		metrics.GpuPState = int32(pState)
+		SetDeviceMetric(handle, metric, float64(metrics.GpuPState))
 	}
 
 	return err
+
 }

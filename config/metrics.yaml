@@ -3,7 +3,10 @@ metrics:
     type: gauge
     help: "ID of the GPU."
     labels:
-      label1: gpu_id
+      label1: gpu_name
+      label2: gpu_temperature_threshold
+      label3: gpu_memory_clock
+      label4: gpu_cores
 
   - name: gpu_name
     type: gauge
@@ -11,7 +14,7 @@ metrics:
     labels:
       label1: gpu_name
 
-  - name: gpu_cpu_utilization
+  - name: gpu_gpu_utilization
     type: gauge
     help: "GPU utilization in percent."
     labels:
@@ -64,6 +67,13 @@ metrics:
   - name: gpu_memory_free
     type: gauge
     help: "Free memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_p_state
+    type: gauge
+    help: "P-State of the GPU."
     labels:
       label1: gpu_id
       label2: gpu_name

@@ -26,9 +26,22 @@ func (lf LabelFunctions) AddFunctions() {
 		return name, ret
 	})
 
+	// GPU temperature threshold protections can shut down system when it hits the temp.limit,
 	lf.Add(config.GPU_TEM_THRESHOLD.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 		threshold, ret := device.GetTemperatureThreshold(nvml.TEMPERATURE_THRESHOLD_SHUTDOWN)
 		return threshold, ret
+	})
+
+	//determines the rate at which the GPU can access and manipulate data stored in the VRAM
+	lf.Add(config.GPU_MEM_CLOCK.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		clock, ret := device.GetClock(nvml.CLOCK_MEM, nvml.CLOCK_ID_CURRENT)
+		return clock, ret
+
+	})
+
+	lf.Add(config.GPU_CORES.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		cores, ret := device.GetNumGpuCores()
+		return cores, ret
 	})
 
 	// @TODO add additional label function to the map

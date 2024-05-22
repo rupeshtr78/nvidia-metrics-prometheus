@@ -6,19 +6,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// GPUDeviceMetrics represents the collected metrics for a GPU device.
-type GPUDeviceMetrics struct {
-	DeviceIndex         int
-	GPUTemperature      float64
-	GPUCPUUtilization   float64
-	GPUMemUtilization   float64
-	GPUPowerUsage       float64
-	GPURunningProcesses int
-	GPUMemoryUsed       uint64
-	GPUMemoryTotal      uint64
-	GPUMemoryFree       uint64
-}
-
 // InitNVML initializes the NVML library.
 func InitNVML() {
 	if err := nvml.Init(); err != nvml.SUCCESS {

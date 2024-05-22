@@ -95,7 +95,13 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		logger.Error("Error collecting device id as metric", zap.Error(err))
 	}
 
-	// Add more metrics here.
+	err = collectPStateMetrics(handle, metrics, config.GPU_P_STATE)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting p state metrics", zap.Error(err))
+	}
+
+	// @TODO Add more metrics here.
+
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil
 }
