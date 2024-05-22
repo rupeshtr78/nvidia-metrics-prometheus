@@ -77,43 +77,112 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		gauge.SetGaugeMetric(config.GPU_TEMPERATURE.GetMetric(), labels, metrics.GPUTemperature)
 	}
 
-	utilization, err := handle.GetUtilizationRates()
-	if err == nvml.SUCCESS {
-		metricCpu := config.GPU_CPU_UTILIZATION.GetMetric()
-		metricCpuLabels := labelManager.GetMetricLabelValues(handle, metricCpu)
-		metrics.GPUCPUUtilization = float64(utilization.Gpu)
-
-		metricMem := config.GPU_MEM_UTILIZATION.GetMetric()
-		metricMemLabels := labelManager.GetMetricLabelValues(handle, metricMem)
-		metrics.GPUMemUtilization = float64(utilization.Memory)
-		gauge.SetGaugeMetric(metricCpu, metricCpuLabels, metrics.GPUCPUUtilization)
-		gauge.SetGaugeMetric(config.GPU_MEM_UTILIZATION.GetMetric(), metricMemLabels, metrics.GPUMemUtilization)
+	err = collectUtilizationMetrics(handle, metrics)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting utilization metrics", zap.Error(err))
 	}
+
+	err = collectMemoryInfoMetrics(handle, metrics)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting memory info metrics", zap.Error(err))
+	}
+
+	err = collectPowerInfoMetrics(handle, metrics)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting power info metrics", zap.Error(err))
+	}
+
+	err = collectRunningProcessMetrics(handle, metrics)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting running process metrics", zap.Error(err))
+	}
+
+	//utilization, err := handle.GetUtilizationRates()
+	//if err == nvml.SUCCESS {
+	//	metricCpu := config.GPU_CPU_UTILIZATION.GetMetric()
+	//	metricCpuLabels := labelManager.GetMetricLabelValues(handle, metricCpu)
+	//	metrics.GPUCPUUtilization = float64(utilization.Gpu)
+	//
+	//	metricMem := config.GPU_MEM_UTILIZATION.GetMetric()
+	//	metricMemLabels := labelManager.GetMetricLabelValues(handle, metricMem)
+	//	metrics.GPUMemUtilization = float64(utilization.Memory)
+	//	gauge.SetGaugeMetric(metricCpu, metricCpuLabels, metrics.GPUCPUUtilization)
+	//	gauge.SetGaugeMetric(config.GPU_MEM_UTILIZATION.GetMetric(), metricMemLabels, metrics.GPUMemUtilization)
+	//}
 
 	//memoryInfo, err := handle.GetMemoryInfo()
 	//if err == nvml.SUCCESS {
 	//	// Memory usage is in bytes, converting to GB.
-	//	metrics.GPUMemoryUsed = float64(memoryInfo.Used) / 1024 / 1024 / 1024
-	//	metrics.GPUMemoryTotal = float64(memoryInfo.Total) / 1024 / 1024 / 1024
-	//	metrics.GPUMemoryFree = float64(memoryInfo.Free) / 1024 / 1024 / 1024
-	//	gauge.SetGaugeMetric(config.GPU_MEMORY_USED.GetMetric(), labels, metrics.GPUMemoryUsed)
-	//	gauge.SetGaugeMetric(config.GPU_MEMORY_TOTAL.GetMetric(), labels, metrics.GPUMemoryTotal)
-	//	gauge.SetGaugeMetric(config.GPU_MEMORY_FREE.GetMetric(), labels, metrics.GPUMemoryFree)
+	//	metrics.GPUMemoryUsed = uint64(memoryInfo.Used) / 1024 / 1024 / 1024
+	//	metrics.GPUMemoryTotal = uint64(memoryInfo.Total) / 1024 / 1024 / 1024
+	//	metrics.GPUMemoryFree = uint64(memoryInfo.Free) / 1024 / 1024 / 1024
+	//	gauge.SetGaugeMetric(config.GPU_MEMORY_USED.GetMetric(), labels, float64(metrics.GPUMemoryUsed))
+	//	gauge.SetGaugeMetric(config.GPU_MEMORY_TOTAL.GetMetric(), labels, float64(metrics.GPUMemoryTotal))
+	//	gauge.SetGaugeMetric(config.GPU_MEMORY_FREE.GetMetric(), labels, float64(metrics.GPUMemoryFree))
 	//}
 
-	gpuPowerUsage, err := handle.GetPowerUsage()
-	if err == nvml.SUCCESS {
-		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
-		gauge.SetGaugeMetric(config.GPU_POWER_USAGE.GetMetric(), labels, metrics.GPUPowerUsage)
-	}
+	//gpuPowerUsage, err := handle.GetPowerUsage()
+	//if err == nvml.SUCCESS {
+	//	metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
+	//	gauge.SetGaugeMetric(config.GPU_POWER_USAGE.GetMetric(), labels, metrics.GPUPowerUsage)
+	//}
 
-	runningProcess, err := handle.GetComputeRunningProcesses()
-	if err == nvml.SUCCESS {
-		metrics.GPURunningProcesses = len(runningProcess)
-		gauge.SetGaugeMetric(config.GPU_RUNNING_PROCESS.GetMetric(), labels, float64(metrics.GPURunningProcesses))
-	}
+	//runningProcess, err := handle.GetComputeRunningProcesses()
+	//if err == nvml.SUCCESS {
+	//	metrics.GPURunningProcesses = len(runningProcess)
+	//	gauge.SetGaugeMetric(config.GPU_RUNNING_PROCESS.GetMetric(), labels, float64(metrics.GPURunningProcesses))
+	//}
 
 	// Add more metrics here.
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil
+}
+
+func collectUtilizationMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
+	utilization, err := handle.GetUtilizationRates()
+	if err == nvml.SUCCESS {
+		metrics.GPUCPUUtilization = float64(utilization.Gpu)
+		SetDeviceMetric(handle, config.GPU_CPU_UTILIZATION, metrics.GPUCPUUtilization)
+
+		metrics.GPUMemUtilization = float64(utilization.Memory)
+		SetDeviceMetric(handle, config.GPU_MEM_UTILIZATION, metrics.GPUMemUtilization)
+	}
+
+	return err
+}
+
+func collectMemoryInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
+	memoryInfo, err := handle.GetMemoryInfo()
+	if err == nvml.SUCCESS {
+		// Memory usage is in bytes, converting to GB.
+		metrics.GPUMemoryUsed = uint64(memoryInfo.Used) / 1024 / 1024 / 1024
+		metrics.GPUMemoryTotal = uint64(memoryInfo.Total) / 1024 / 1024 / 1024
+		metrics.GPUMemoryFree = uint64(memoryInfo.Free) / 1024 / 1024 / 1024
+
+		SetDeviceMetric(handle, config.GPU_MEMORY_USED, float64(metrics.GPUMemoryUsed))
+		SetDeviceMetric(handle, config.GPU_MEMORY_TOTAL, float64(metrics.GPUMemoryTotal))
+		SetDeviceMetric(handle, config.GPU_MEMORY_FREE, float64(metrics.GPUMemoryFree))
+	}
+
+	return err
+}
+
+func collectPowerInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
+	gpuPowerUsage, err := handle.GetPowerUsage()
+	if err == nvml.SUCCESS {
+		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
+		SetDeviceMetric(handle, config.GPU_POWER_USAGE, metrics.GPUPowerUsage)
+	}
+
+	return err
+}
+
+func collectRunningProcessMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
+	runningProcess, err := handle.GetComputeRunningProcesses()
+	if err == nvml.SUCCESS {
+		metrics.GPURunningProcesses = len(runningProcess)
+		SetDeviceMetric(handle, config.GPU_RUNNING_PROCESS, float64(metrics.GPURunningProcesses))
+	}
+
+	return err
 }

@@ -45,3 +45,24 @@ metrics:
     labels:
       label1: gpu_id
       label2: gpu_name
+
+  - name: gpu_memory_total
+    type: gauge
+    help: "Total memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_used
+    type: gauge
+    help: "Used memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_free
+    type: gauge
+    help: "Free memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name

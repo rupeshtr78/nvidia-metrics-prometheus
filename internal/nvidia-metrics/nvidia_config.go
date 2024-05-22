@@ -2,6 +2,8 @@ package nvidiametrics
 
 import (
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
+	"github.com/rupeshtr78/nvidia-metrics/internal/config"
+	gauge "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -14,6 +16,9 @@ type GPUDeviceMetrics struct {
 	GPUMemUtilization   float64
 	GPUPowerUsage       float64
 	GPURunningProcesses int
+	GPUMemoryUsed       uint64
+	GPUMemoryTotal      uint64
+	GPUMemoryFree       uint64
 }
 
 // InitNVML initializes the NVML library.
@@ -30,4 +35,10 @@ func ShutdownNVML() {
 		logger.Fatal("Failed to shutdown NVML", zap.Error(err))
 	}
 	logger.Info("Shutdown NVML")
+}
+
+func SetDeviceMetric(handle nvml.Device, metricConfig config.Metric, metricValue float64) {
+	metric := metricConfig.GetMetric()
+	metricLabels := labelManager.GetMetricLabelValues(handle, metric)
+	gauge.SetGaugeMetric(metric, metricLabels, metricValue)
 }
