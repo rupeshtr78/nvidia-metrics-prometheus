@@ -45,5 +45,9 @@ func (lf LabelFunctions) AddFunctions() {
 	})
 
 	// @TODO add additional label function to the map
-
+	// lf.Add(config.GPU_POWER.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+	// 	nvml.SystemGetCudaDriverVersion()
+	// 	pci, ret := nvml.DeviceGetPciInfo(device)
+	//     nvml.DeviceGetSupportedMemoryClocks(device)
+	// })
 }
