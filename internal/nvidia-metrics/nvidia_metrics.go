@@ -126,7 +126,7 @@ func collectMemoryClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, me
 }
 
 func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.ECC_COUNTER_TYPE_COUNT)
+	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
 		metrics.GpuEccErrors = eccErrors
 		SetDeviceMetric(handle, metric, float64(eccErrors))
@@ -135,7 +135,7 @@ func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetr
 }
 
 func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_UNCORRECTED, nvml.ECC_COUNTER_TYPE_COUNT)
+	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_UNCORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
 		metrics.GpuEccErrors = eccErrors
 		SetDeviceMetric(handle, metric, float64(eccErrors))
