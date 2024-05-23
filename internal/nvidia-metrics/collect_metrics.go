@@ -100,6 +100,21 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		logger.Error("Error collecting p state metrics", zap.Error(err))
 	}
 
+	err = collectMemoryClockMetrics(handle, metrics, config.GPU_MEMORY_CLOCK)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting memory clock metrics", zap.Error(err))
+	}
+
+	err = collectEccCorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_CORRECTED_ERRORS)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting ECC corrected errors metrics", zap.Error(err))
+	}
+
+	err = collectEccUncorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_UNCORRECTED_ERRORS)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting ECC uncorrected errors metrics", zap.Error(err))
+	}
+
 	// @TODO Add more metrics here.
 
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))

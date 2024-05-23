@@ -5,9 +5,12 @@ metrics:
     labels:
       label1: gpu_name
       label2: gpu_temperature_threshold
-      label3: gpu_memory_clock
+      label3: gpu_memory_clock_max
       label4: gpu_cores
       label5: gpu_id
+      label6: gpu_driver_version
+      label7: gpu_cuda_version
+
 
   - name: gpu_name
     type: gauge
@@ -75,6 +78,27 @@ metrics:
   - name: gpu_p_state
     type: gauge
     help: "P-State of the GPU."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_clock
+    type: gauge
+    help: "Memory clock of the GPU in MHz."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_ecc_corrected_errors
+    type: gauge
+    help: "Number of corrected ECC errors."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_ecc_uncorrected_errors
+    type: gauge
+    help: "Number of uncorrected ECC errors."
     labels:
       label1: gpu_id
       label2: gpu_name

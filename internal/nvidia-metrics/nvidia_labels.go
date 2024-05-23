@@ -33,8 +33,8 @@ func (lf LabelFunctions) AddFunctions() {
 	})
 
 	//determines the rate at which the GPU can access and manipulate data stored in the VRAM
-	lf.Add(config.GPU_MEM_CLOCK.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
-		clock, ret := device.GetClock(nvml.CLOCK_MEM, nvml.CLOCK_ID_CURRENT)
+	lf.Add(config.GPU_MEM_CLOCK_MAX.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		clock, ret := device.GetMaxClockInfo(nvml.CLOCK_MEM)
 		return clock, ret
 
 	})
@@ -44,10 +44,19 @@ func (lf LabelFunctions) AddFunctions() {
 		return cores, ret
 	})
 
+	lf.Add(config.GPU_DRIVER_VERSION.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		driverVersion, ret := nvml.SystemGetDriverVersion()
+		return driverVersion, ret
+	})
+
+	lf.Add(config.GPU_CUDA_VERSION.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		cudaVersion, ret := nvml.SystemGetCudaDriverVersion()
+		return cudaVersion, ret
+	})
+
 	// @TODO add additional label function to the map
-	// lf.Add(config.GPU_POWER.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
-	// 	nvml.SystemGetCudaDriverVersion()
-	// 	pci, ret := nvml.DeviceGetPciInfo(device)
-	//     nvml.DeviceGetSupportedMemoryClocks(device)
-	// })
+	//lf.Add(config.GPU_POWER.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+	//	operationMode, _, r := device.GetGpuOperationMode()
+	//})
+
 }

@@ -1,6 +1,7 @@
 package nvidiametrics
 
 import (
+	"fmt"
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
 	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 )
@@ -17,8 +18,11 @@ type GPUDeviceMetrics struct {
 	GPUMemoryTotal      uint64
 	GPUMemoryFree       uint64
 	GpuPState           int32
+	GpuClock            uint32
+	GpuEccErrors        uint64
 }
 
+// CollectDeviceMetrics collects all the metrics for the GPU device.
 func CollectUtilizationMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
@@ -32,6 +36,7 @@ func CollectUtilizationMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nv
 	return err
 }
 
+// CollectMemoryInfoMetrics collects the memory usage metrics for the GPU device.
 func CollectMemoryInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
 	memoryInfo, err := handle.GetMemoryInfo()
 	if err == nvml.SUCCESS {
@@ -48,6 +53,7 @@ func CollectMemoryInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvm
 	return err
 }
 
+// CollectPowerInfoMetrics collects the power usage metrics for the GPU device.
 func CollectPowerInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	gpuPowerUsage, err := handle.GetPowerUsage()
 	if err == nvml.SUCCESS {
@@ -58,6 +64,7 @@ func CollectPowerInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metr
 	return err
 }
 
+// CollectRunningProcessMetrics collects the number of running processes on the GPU device.
 func CollectRunningProcessMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	runningProcess, err := handle.GetComputeRunningProcesses()
 	if err == nvml.SUCCESS {
@@ -68,6 +75,7 @@ func CollectRunningProcessMetrics(handle nvml.Device, metrics *GPUDeviceMetrics,
 	return err
 }
 
+// CollectTemperatureMetrics collects the temperature metrics for the GPU device.
 func CollectTemperatureMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {
@@ -78,6 +86,7 @@ func CollectTemperatureMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, me
 	return err
 }
 
+// CollectDeviceIdAsMetric collects the device id as a metric.
 func CollectDeviceIdAsMetric(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	deviceId, err := handle.GetIndex()
 	if err == nvml.SUCCESS {
@@ -104,3 +113,55 @@ func collectPStateMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric 
 	return err
 
 }
+
+// collectMemoryClockMetrics collects the memory clock metrics for the GPU device.
+func collectMemoryClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	memoryClock, err := handle.GetClock(nvml.CLOCK_MEM, nvml.CLOCK_ID_CURRENT)
+	if err == nvml.SUCCESS {
+		metrics.GpuClock = memoryClock
+		SetDeviceMetric(handle, metric, float64(memoryClock))
+	}
+
+	return err
+}
+
+func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.ECC_COUNTER_TYPE_COUNT)
+	if err == nvml.SUCCESS {
+		metrics.GpuEccErrors = eccErrors
+		SetDeviceMetric(handle, metric, float64(eccErrors))
+	}
+	return err
+}
+
+func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_UNCORRECTED, nvml.ECC_COUNTER_TYPE_COUNT)
+	if err == nvml.SUCCESS {
+		metrics.GpuEccErrors = eccErrors
+		SetDeviceMetric(handle, metric, float64(eccErrors))
+	}
+	return err
+}
+
+// @TODO add metrics here
+func collectComputeRunningProcesses(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
+
+	//handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.ECC_COUNTER_TYPE_COUNT)
+	processInfos, _ := handle.GetComputeRunningProcesses()
+	for _, processInfo := range processInfos {
+		fmt.Printf("Process Info: %+v\n", processInfo)
+		fmt.Printf("Process Info: %+v\n", processInfo.Pid)
+		fmt.Printf("Process Info: %+v\n", processInfo.UsedGpuMemory)
+		fmt.Printf("Process Info: %+v\n", processInfo.GpuInstanceId)
+		fmt.Printf("Process Info: %+v\n", processInfo.ComputeInstanceId)
+	}
+	return nvml.SUCCESS
+
+}
+
+// Additional Metrics can be added here
+//handle.GetActiveVgpus()
+//handle.GetEncoderUtilization()
+//handle.GetDecoderUtilization()
+//handle.GetEccMode()
+//handle.GetTotalEccErrors()
