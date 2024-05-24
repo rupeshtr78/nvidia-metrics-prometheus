@@ -177,7 +177,11 @@ func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMe
 }
 
 func collectFanSpeedMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	fanSpeed, err := handle.GetFanSpeed()
+	fans, err := handle.GetNumFans()
+	if err != nvml.SUCCESS || fans == 0 {
+		return err
+	}
+	fanSpeed, err := handle.GetFanSpeed_v2(fans)
 	if err == nvml.SUCCESS {
 		metrics.GpuFanSpeed = fanSpeed
 		SetDeviceMetric(handle, metric, float64(fanSpeed))

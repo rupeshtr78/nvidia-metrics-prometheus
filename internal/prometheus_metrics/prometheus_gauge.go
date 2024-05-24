@@ -19,8 +19,8 @@ func CreateGauge(name string, labels GpuLabels, value float64) error {
 
 	gaugeVec, err := RegisteredMetrics.GetMetric(name)
 	if err != nil {
-		logger.Error("Failed to get metric from map", zap.Error(err))
-		return err
+		logger.Warn("Failed to get metric from metrics map", zap.Error(err))
+		return nil
 	}
 
 	// get prometheus labels
