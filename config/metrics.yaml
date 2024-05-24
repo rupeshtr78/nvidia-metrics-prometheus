@@ -91,16 +91,45 @@ metrics:
       label2: gpu_name
       label3: gpu_memory_clock_max
 
-  - name: gpu_ecc_corrected_errors
+  # - name: gpu_ecc_corrected_errors
+  #   type: gauge
+  #   help: "Number of corrected ECC errors."
+  #   labels:
+  #     label1: gpu_id
+  #     label2: gpu_name
+
+  # - name: gpu_ecc_uncorrected_errors
+  #   type: gauge
+  #   help: "Number of uncorrected ECC errors."
+  #   labels:
+  #     label1: gpu_id
+  #     label2: gpu_name
+
+  - name: gpu_fan_speed
     type: gauge
-    help: "Number of corrected ECC errors."
+    help: "Fan speed of the GPU in percent."
     labels:
       label1: gpu_id
       label2: gpu_name
 
-  - name: gpu_ecc_uncorrected_errors
+  - name: gpu_sm_clock
     type: gauge
-    help: "Number of uncorrected ECC errors."
+    help: "SM clock of the GPU in MHz."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+      label3: gpu_sm_clock_max
+
+  - name: gpu_graphics_clock
+    type: gauge
+    help: "Maximum graphics clock of the GPU in MHz."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_video_clock
+    type: gauge
+    help: "Maximum video clock of the GPU in MHz."
     labels:
       label1: gpu_id
       label2: gpu_name
