@@ -159,6 +159,10 @@ func collectGpuGraphicsClockMetrics(handle nvml.Device, metrics *GPUDeviceMetric
 }
 
 func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	// if _, ok := prometheusmetrics.RegisteredMetrics[metric.GetMetric()]; !ok {
+	// 	return nvmlerrors.METRIC_NOT_REGISTERED
+	// }
+
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
 		metrics.GpuEccErrors = eccErrors
@@ -168,6 +172,10 @@ func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetr
 }
 
 func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	// if _, ok := prometheusmetrics.RegisteredMetrics[metric.GetMetric()]; !ok {
+	// 	return nvmlerrors.HandleErrors(nvmlerrors.METRIC_NOT_REGISTERED)
+	// }
+
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_UNCORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
 		metrics.GpuEccErrors = eccErrors
