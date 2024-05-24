@@ -2,7 +2,6 @@ package prometheusmetrics
 
 import (
 	"fmt"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/utils"
@@ -57,7 +56,6 @@ func CreatePrometheusMetrics(filePath string) error {
 
 	err := utils.LoadFromYAMLV2(filePath, &m)
 	if err != nil {
-		logger.Fatal("Failed to read metrics yaml file", zap.String("file", filePath), zap.Error(err))
 		return err
 	}
 
@@ -74,12 +72,7 @@ func CreatePrometheusMetrics(filePath string) error {
 		}
 
 		// Add the metric to the metrics map
-
 		RegisteredMetrics.AddMetric(metric.Name.GetMetric(), gaugeVec)
-		// metricMap[metric.Name] = gaugeVec
-		// MetricsMap[metric.Name] = gaugeVec
-		// Add Labels to the labels map
-
 		RegisteredLabels.AddLabels(metric.Name.GetMetric(), metric.Labels)
 
 	}

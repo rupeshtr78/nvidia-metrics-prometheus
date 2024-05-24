@@ -28,7 +28,13 @@ func LoadFromYAMLV2(fileName string, model interface{}) error {
 		logger.Error("error opening file", zap.String("fileName", fileName), zap.Error(err))
 		return err
 	}
-	defer file.Close()
+
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			logger.Error("error closing file", zap.String("fileName", fileName), zap.Error(err))
+		}
+	}(file)
 
 	decoder := yaml.NewDecoder(file)
 	err = decoder.Decode(model)

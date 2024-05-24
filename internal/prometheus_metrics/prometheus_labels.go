@@ -14,6 +14,9 @@ func GetGPuLabels(labels GpuLabels) ([]string, error) {
 	}
 
 	for _, v := range labels {
+		if v == "" {
+			return nil, fmt.Errorf("label value is empty")
+		}
 		labelList = append(labelList, v)
 	}
 	return labelList, nil
