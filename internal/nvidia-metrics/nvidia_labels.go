@@ -4,6 +4,7 @@ import (
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
 	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 	gauge "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
+	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 )
 
 // SetDeviceMetric sets the metric value for the given device
@@ -39,6 +40,11 @@ func (lf LabelFunctions) AddFunctions() {
 
 	})
 
+	lf.Add(config.GPU_SM_CLOCK_MAX.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		clock, ret := device.GetMaxClockInfo(nvml.CLOCK_SM)
+		return clock, ret
+	})
+
 	lf.Add(config.GPU_CORES.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 		cores, ret := device.GetNumGpuCores()
 		return cores, ret
@@ -58,5 +64,7 @@ func (lf LabelFunctions) AddFunctions() {
 	//lf.Add(config.GPU_POWER.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 	//	operationMode, _, r := device.GetGpuOperationMode()
 	//})
+
+	logger.Debug("Collected GPU Labels")
 
 }

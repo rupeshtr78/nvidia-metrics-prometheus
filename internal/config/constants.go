@@ -34,6 +34,7 @@ const (
 	GPU_NAME           Label = "gpu_name"
 	GPU_TEM_THRESHOLD  Label = "gpu_temperature_threshold"
 	GPU_MEM_CLOCK_MAX  Label = "gpu_memory_clock_max"
+	GPU_SM_CLOCK_MAX   Label = "gpu_sm_clock_max"
 	GPU_CORES          Label = "gpu_cores"
 	GPU_DRIVER_VERSION Label = "gpu_driver_version"
 	GPU_CUDA_VERSION   Label = "gpu_cuda_version"

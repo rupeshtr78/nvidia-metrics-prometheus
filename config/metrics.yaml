@@ -10,6 +10,7 @@ metrics:
       label5: gpu_id
       label6: gpu_driver_version
       label7: gpu_cuda_version
+      label8: gpu_sm_clock_max
 
 
   - name: gpu_name
