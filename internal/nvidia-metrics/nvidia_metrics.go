@@ -176,6 +176,7 @@ func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMe
 	return err
 }
 
+// @TODO Fix this
 func collectFanSpeedMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	fans, err := handle.GetNumFans()
 	if err != nvml.SUCCESS || fans == 0 {
