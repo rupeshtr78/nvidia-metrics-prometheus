@@ -1,6 +1,8 @@
 package nvmlerrors
 
 import (
+	"fmt"
+
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
 )
 
@@ -12,13 +14,9 @@ type MetricReturn struct {
 
 const (
 	ERR_NONE              = iota
-	METRIC_NOT_REGISTERED = 100
+	METRIC_NOT_REGISTERED = 1000
 )
 
-const (
-	ERR_NONE_STR              = "No error"
-	ERR_METRIC_NOT_REGISTERED = "Metric not registered"
-)
 
 func (e *MetricReturn) Error() string {
 	return e.String()
@@ -26,7 +24,7 @@ func (e *MetricReturn) Error() string {
 
 // String method
 func (e *MetricReturn) String() string {
-
+    // if metric error is less than or equal to the return error, return the return nvml error
 	if e.MetricError <= int32(e.Return) {
 		return e.Return.Error()
 	}
@@ -34,16 +32,25 @@ func (e *MetricReturn) String() string {
 	case ERR_NONE:
 		return nvml.SUCCESS.String()
 	case METRIC_NOT_REGISTERED:
-		return ERR_METRIC_NOT_REGISTERED
+		return "ERR_METRIC_NOT_REGISTERED"
 	default:
-		return e.Return.String()
+		return e.Return.Error()
 	}
 }
 
-func HandleErrors(err *MetricReturn) {
-	if err.MetricError != ERR_NONE {
-		err.Return = nvml.ERROR_UNKNOWN
-	} else if err.Return != nvml.SUCCESS {
-		err.MetricError = int32(err.Return)
-	}
+// ErrorInit is a function that initializes the MetricReturn struct
+func ErrorInit() *MetricReturn {
+	return &MetricReturn{}
+
+}
+
+// Errormain is a function that demonstrates the use of the MetricReturn struct
+func Errormain() {
+	me := ErrorInit()
+	// me.MetricError = METRIC_NOT_REGISTERED
+	fmt.Println(me.Error())
+
+	me.Return = nvml.ERROR_OPERATING_SYSTEM
+	fmt.Println(me.Error())
+
 }
