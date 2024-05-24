@@ -23,6 +23,7 @@ const (
 	GPU_VIDEO_CLOCK            Metric = "gpu_video_clock"
 	GPU_ECC_CORRECTED_ERRORS   Metric = "gpu_ecc_corrected_errors"
 	GPU_ECC_UNCORRECTED_ERRORS Metric = "gpu_ecc_uncorrected_errors"
+	GPU_FAN_SPEED              Metric = "gpu_fan_speed"
 )
 
 type Label string

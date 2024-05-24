@@ -100,11 +100,6 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		logger.Error("Error collecting p state metrics", zap.Error(err))
 	}
 
-	err = collectMemoryClockMetrics(handle, metrics, config.GPU_MEMORY_CLOCK)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting memory clock metrics", zap.Error(err))
-	}
-
 	err = collectEccCorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_CORRECTED_ERRORS)
 	if err != nvml.SUCCESS {
 		logger.Error("Error collecting ECC corrected errors metrics", zap.Error(err))
@@ -113,6 +108,31 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 	err = collectEccUncorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_UNCORRECTED_ERRORS)
 	if err != nvml.SUCCESS {
 		logger.Error("Error collecting ECC uncorrected errors metrics", zap.Error(err))
+	}
+
+	err = collectGpuClockMetrics(handle, metrics, config.GPU_SM_CLOCK)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting GPU clock metrics", zap.Error(err))
+	}
+
+	err = collectGpuGraphicsClockMetrics(handle, metrics, config.GPU_GRAPHICS_CLOCK)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting GPU graphics clock metrics", zap.Error(err))
+	}
+
+	err = collectGpuVideoClockMetrics(handle, metrics, config.GPU_VIDEO_CLOCK)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting GPU video clock metrics", zap.Error(err))
+	}
+
+	err = collectMemoryClockMetrics(handle, metrics, config.GPU_MEMORY_CLOCK)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting memory clock metrics", zap.Error(err))
+	}
+
+	err = collectFanSpeedMetrics(handle, metrics, config.GPU_FAN_SPEED)
+	if err != nvml.SUCCESS {
+		logger.Error("Error collecting fan speed metrics", zap.Error(err))
 	}
 
 	// @TODO Add more metrics here.

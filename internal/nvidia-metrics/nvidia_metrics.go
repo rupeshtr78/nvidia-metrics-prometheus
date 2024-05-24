@@ -21,6 +21,7 @@ type GPUDeviceMetrics struct {
 	GpuPState           int32
 	GpuClock            uint32
 	GpuEccErrors        uint64
+	GpuFanSpeed         uint32
 }
 
 // CollectDeviceMetrics collects all the metrics for the GPU device.
@@ -137,6 +138,26 @@ func collectGpuClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metri
 	return err
 }
 
+func collectGpuVideoClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	memoryClock, err := handle.GetClock(nvml.CLOCK_VIDEO, nvml.CLOCK_ID_CURRENT)
+	if err == nvml.SUCCESS {
+		metrics.GpuClock = memoryClock
+		SetDeviceMetric(handle, metric, float64(memoryClock))
+	}
+
+	return err
+}
+
+func collectGpuGraphicsClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	memoryClock, err := handle.GetClock(nvml.CLOCK_GRAPHICS, nvml.CLOCK_ID_CURRENT)
+	if err == nvml.SUCCESS {
+		metrics.GpuClock = memoryClock
+		SetDeviceMetric(handle, metric, float64(memoryClock))
+	}
+
+	return err
+}
+
 func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
@@ -151,6 +172,15 @@ func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMe
 	if err == nvml.SUCCESS {
 		metrics.GpuEccErrors = eccErrors
 		SetDeviceMetric(handle, metric, float64(eccErrors))
+	}
+	return err
+}
+
+func collectFanSpeedMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	fanSpeed, err := handle.GetFanSpeed()
+	if err == nvml.SUCCESS {
+		metrics.GpuFanSpeed = fanSpeed
+		SetDeviceMetric(handle, metric, float64(fanSpeed))
 	}
 	return err
 }
