@@ -1,0 +1,6 @@
+metrics:
+  - name: gpu_name
+    type: gauge
+    help: "Name of the GPU."
+    labels:
+      label1: gpu_name

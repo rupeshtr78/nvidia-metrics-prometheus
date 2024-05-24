@@ -1,9 +1,17 @@
 metrics:
-  - name: gpu_id
+  - name: gpu_id_metric
     type: gauge
     help: "ID of the GPU."
     labels:
-      label1: gpu_id
+      label1: gpu_name
+      label2: gpu_temperature_threshold
+      label3: gpu_memory_clock_max
+      label4: gpu_cores
+      label5: gpu_id
+      label6: gpu_driver_version
+      label7: gpu_cuda_version
+      label8: gpu_sm_clock_max
+
 
   - name: gpu_name
     type: gauge
@@ -11,7 +19,7 @@ metrics:
     labels:
       label1: gpu_name
 
-  - name: gpu_cpu_utilization
+  - name: gpu_gpu_utilization
     type: gauge
     help: "GPU utilization in percent."
     labels:
@@ -31,6 +39,7 @@ metrics:
     labels:
       label1: gpu_id
       label2: gpu_name
+      label3: gpu_temperature_threshold
 
   - name: gpu_power_usage
     type: gauge
@@ -42,6 +51,85 @@ metrics:
   - name: gpu_running_process
     type: gauge
     help: "Number of running processes on the GPU."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_total
+    type: gauge
+    help: "Total memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_used
+    type: gauge
+    help: "Used memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_free
+    type: gauge
+    help: "Free memory of the GPU in MiB."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_p_state
+    type: gauge
+    help: "P-State of the GPU."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_memory_clock
+    type: gauge
+    help: "Memory clock of the GPU in MHz."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+      label3: gpu_memory_clock_max
+
+  # - name: gpu_ecc_corrected_errors
+  #   type: gauge
+  #   help: "Number of corrected ECC errors."
+  #   labels:
+  #     label1: gpu_id
+  #     label2: gpu_name
+
+  # - name: gpu_ecc_uncorrected_errors
+  #   type: gauge
+  #   help: "Number of uncorrected ECC errors."
+  #   labels:
+  #     label1: gpu_id
+  #     label2: gpu_name
+
+  - name: gpu_fan_speed
+    type: gauge
+    help: "Fan speed of the GPU in percent."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_sm_clock
+    type: gauge
+    help: "SM clock of the GPU in MHz."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+      label3: gpu_sm_clock_max
+
+  - name: gpu_graphics_clock
+    type: gauge
+    help: "Maximum graphics clock of the GPU in MHz."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+
+  - name: gpu_video_clock
+    type: gauge
+    help: "Maximum video clock of the GPU in MHz."
     labels:
       label1: gpu_id
       label2: gpu_name

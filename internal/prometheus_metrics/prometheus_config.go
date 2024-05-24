@@ -2,6 +2,7 @@ package prometheusmetrics
 
 import (
 	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 )
@@ -55,5 +56,5 @@ func (m *MetricMap) GetMetric(metricName string) (*prometheus.GaugeVec, error) {
 	if metric, ok := (*m)[metricName]; ok {
 		return metric, nil
 	}
-	return nil, fmt.Errorf("metric %v not found in map", metricName)
+	return nil, fmt.Errorf("skipping metric: %v not found in config map", metricName)
 }
