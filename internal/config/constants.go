@@ -18,6 +18,9 @@ const (
 	GPU_MEMORY_FREE            Metric = "gpu_memory_free"
 	GPU_P_STATE                Metric = "gpu_p_state"
 	GPU_MEMORY_CLOCK           Metric = "gpu_memory_clock"
+	GPU_GRAPHICS_CLOCK         Metric = "gpu_graphics_clock"
+	GPU_SM_CLOCK               Metric = "gpu_sm_clock"
+	GPU_VIDEO_CLOCK            Metric = "gpu_video_clock"
 	GPU_ECC_CORRECTED_ERRORS   Metric = "gpu_ecc_corrected_errors"
 	GPU_ECC_UNCORRECTED_ERRORS Metric = "gpu_ecc_uncorrected_errors"
 )

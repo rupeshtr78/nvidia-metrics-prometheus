@@ -2,6 +2,7 @@ package nvidiametrics
 
 import (
 	"fmt"
+
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
 	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 )
@@ -117,6 +118,17 @@ func collectPStateMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric 
 // collectMemoryClockMetrics collects the memory clock metrics for the GPU device.
 func collectMemoryClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
 	memoryClock, err := handle.GetClock(nvml.CLOCK_MEM, nvml.CLOCK_ID_CURRENT)
+	if err == nvml.SUCCESS {
+		metrics.GpuClock = memoryClock
+		SetDeviceMetric(handle, metric, float64(memoryClock))
+	}
+
+	return err
+}
+
+// collectMemoryClockMetrics collects the memory clock metrics for the GPU device.
+func collectGpuClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	memoryClock, err := handle.GetClock(nvml.CLOCK_SM, nvml.CLOCK_ID_CURRENT)
 	if err == nvml.SUCCESS {
 		metrics.GpuClock = memoryClock
 		SetDeviceMetric(handle, metric, float64(memoryClock))
