@@ -9,7 +9,7 @@
 - [ ] Docker
 - [ ] Docker Compose
 - [ ] User Viper
-- [ ] User Cobra
+- [ ] Use Flag
 - [ ] Add Cli Ux
 - [ ] Add Detailed Readme
 
