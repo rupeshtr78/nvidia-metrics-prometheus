@@ -74,14 +74,24 @@ RUN chown -R $USER_NAME: /app
 # set user
 USER $USER_NAME
 
-COPY --chown=$USER_UID:$USER_GID --from=builder /app/manager /app/manager
+COPY --chown=$USER_UID:$USER_GID --from=builder /app/nvidia-metrics /app/nvidia-metrics
 
-# Set up default configs path
-ENV APP_CONFIG_PATH /app/config
 
-EXPOSE 9500
+# Set environment variables with default values
+ENV CONFIG_FILE=config/metrics.yaml
+ENV LOG_LEVEL=info
+ENV PORT=9500
+ENV HOST=localhost
+ENV INTERVAL=5
+
+EXPOSE $PORT
 # use tini to perform correct signal handling
 ENTRYPOINT ["/tini", "--"]
 
 # server should be the default command
-CMD ["/app/manager"]
+CMD ["/app/nvidia-metrics"]
+
+
+
+
+
