@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetLogger(t *testing.T) {
-	err := GetLogger()
+	err := GetLogger("info")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -18,7 +18,6 @@ func TestGetLogger(t *testing.T) {
 }
 
 func TestLogLevels(t *testing.T) {
-	GetLogger()
 
 	tests := []struct {
 		level   string

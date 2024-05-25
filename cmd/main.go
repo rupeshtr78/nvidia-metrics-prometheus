@@ -17,8 +17,8 @@ import (
 
 var (
 	configFile = flag.String("config", "config/metrics.yaml", "Path to the configuration file")
-	logLevel   = flag.String("log-level", "info", "Log level (debug, info, warn, error,fatal)")
-	port 	 = flag.String("port", "9500", "Port to run the metrics server")
+	logLevel   = flag.String("loglevel", "info", "Log level (debug, info, warn, error,fatal)")
+	port       = flag.String("port", "9500", "Port to run the metrics server")
 )
 
 func main() {
@@ -28,11 +28,17 @@ func main() {
 		log.Fatal("Config file is required")
 	}
 
+	// Initialize the logger
+	err := logger.GetLogger(*logLevel)
+	if err != nil {
+		log.Fatal("Failed to initialize logger", err)
+	}
+
 	filePath := filepath.Join(*configFile)
 
 	// Register the metrics with Prometheus and start the metrics server
 	// provide --config "config/metrics.yaml"
-	err := prometheusmetrics.CreatePrometheusMetrics(filePath)
+	err = prometheusmetrics.CreatePrometheusMetrics(filePath)
 	if err != nil {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)
@@ -40,7 +46,6 @@ func main() {
 
 	//// run the metrics server
 	api.RunPrometheusMetricsServer()
-
 
 }
 

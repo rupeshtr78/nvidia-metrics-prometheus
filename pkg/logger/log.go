@@ -42,7 +42,7 @@ func GetLogger(level string) (err error) {
 	logger, err = config.Build(zap.AddCallerSkip(1)) // Skip one level to account for this wrapper.
 
 	if err != nil {
-		err = fmt.Errorf("Failed to initialize logger: %v", err)
+		err = fmt.Errorf("failed to initialize logger: %v", err)
 		return err
 	}
 

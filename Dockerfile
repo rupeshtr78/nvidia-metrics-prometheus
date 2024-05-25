@@ -1,6 +1,8 @@
 FROM golang:1.21.7-bullseye AS builder
 ARG TARGETOS
 ARG TARGETARCH
+ARG PORT
+ARG HOST
 
 # Install required packages
 RUN set -ex; \
