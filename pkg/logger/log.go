@@ -15,8 +15,8 @@ import (
 // logger is the global logger instance.
 var logger *zap.Logger
 
-func init() {
-	level := "info"
+// @TODO - remove after testing
+func Loggerinit(level string) {
 	err := GetLogger(level)
 
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/rupeshtr78/nvidia-metrics/api"
@@ -19,6 +20,8 @@ var (
 	configFile = flag.String("config", "config/metrics.yaml", "Path to the configuration file")
 	logLevel   = flag.String("loglevel", "info", "Log level (debug, info, warn, error,fatal)")
 	port       = flag.String("port", "9500", "Port to run the metrics server")
+	host       = flag.String("host", "localhost", "Host to run the metrics server")
+	interval   = flag.String("interval", "5", "Time interval in seconds to scrape metrics")
 )
 
 func main() {
@@ -36,16 +39,30 @@ func main() {
 
 	filePath := filepath.Join(*configFile)
 
-	// Register the metrics with Prometheus and start the metrics server
-	// provide --config "config/metrics.yaml"
+	// Register the metrics with Prometheus
 	err = prometheusmetrics.CreatePrometheusMetrics(filePath)
 	if err != nil {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)
 	}
 
-	//// run the metrics server
-	api.RunPrometheusMetricsServer()
+	// get the address from the flag host and port
+	address := *host + ":" + *port
+
+	//  get the metrics scrape interval
+	t, err := strconv.Atoi(*interval)
+	if err != nil {
+		logger.Fatal("Failed to convert time to integer", zap.Error(err))
+		os.Exit(1)
+	}
+
+	var scrapreInterval time.Duration
+	if t > 0 {
+		scrapreInterval = time.Duration(t) * time.Second
+	}
+
+	// start the metrics server
+	api.RunPrometheusMetricsServer(address, scrapreInterval)
 
 }
 
