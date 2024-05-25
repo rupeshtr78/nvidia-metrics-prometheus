@@ -15,8 +15,8 @@ type MetricReturn struct {
 const (
 	ERR_NONE              = iota
 	METRIC_NOT_REGISTERED = 1000
+	LABEL_NOT_REGISTERED  = 1001
 )
-
 
 func (e *MetricReturn) Error() string {
 	return e.String()
@@ -24,7 +24,7 @@ func (e *MetricReturn) Error() string {
 
 // String method
 func (e *MetricReturn) String() string {
-    // if metric error is less than or equal to the return error, return the return nvml error
+	// if metric error is less than or equal to the return error, return the return nvml error
 	if e.MetricError <= int32(e.Return) {
 		return e.Return.Error()
 	}
@@ -44,6 +44,7 @@ func ErrorInit() *MetricReturn {
 
 }
 
+// @TODO implement
 // Errormain is a function that demonstrates the use of the MetricReturn struct
 func Errormain() {
 	me := ErrorInit()
