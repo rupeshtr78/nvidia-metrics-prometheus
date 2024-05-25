@@ -38,9 +38,6 @@ func isRegistered(metric config.Metric) bool {
 
 // CollectDeviceMetrics collects all the metrics for the GPU device.
 func CollectUtilizationMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
-	if !isRegistered(config.GPU_GPU_UTILIZATION) || !isRegistered(config.GPU_MEM_UTILIZATION) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
 
 	utilization, err := handle.GetUtilizationRates()
 	if err == nvml.SUCCESS {
@@ -56,11 +53,8 @@ func CollectUtilizationMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nv
 
 // CollectMemoryInfoMetrics collects the memory usage metrics for the GPU device.
 func CollectMemoryInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvml.Return {
-	if !isRegistered(config.GPU_MEMORY_USED) || !isRegistered(config.GPU_MEMORY_TOTAL) || !isRegistered(config.GPU_MEMORY_FREE) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	memoryInfo, err := handle.GetMemoryInfo()
+
 	if err == nvml.SUCCESS {
 		// Memory usage is in bytes, converting to GB.
 		metrics.GPUMemoryUsed = uint64(memoryInfo.Used) / 1024 / 1024 //  memory is in bytes and we want MB
@@ -77,10 +71,6 @@ func CollectMemoryInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics) nvm
 
 // CollectPowerInfoMetrics collects the power usage metrics for the GPU device.
 func CollectPowerInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	gpuPowerUsage, err := handle.GetPowerUsage()
 	if err == nvml.SUCCESS {
 		metrics.GPUPowerUsage = float64(gpuPowerUsage) / 1000 // Assuming power is in mW and we want W.
@@ -92,10 +82,6 @@ func CollectPowerInfoMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metr
 
 // CollectRunningProcessMetrics collects the number of running processes on the GPU device.
 func CollectRunningProcessMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	runningProcess, err := handle.GetComputeRunningProcesses()
 	if err == nvml.SUCCESS {
 		metrics.GPURunningProcesses = len(runningProcess)
@@ -107,10 +93,6 @@ func CollectRunningProcessMetrics(handle nvml.Device, metrics *GPUDeviceMetrics,
 
 // CollectTemperatureMetrics collects the temperature metrics for the GPU device.
 func CollectTemperatureMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	temperature, err := handle.GetTemperature(nvml.TEMPERATURE_GPU)
 	if err == nvml.SUCCESS {
 		metrics.GPUTemperature = float64(temperature)
@@ -122,10 +104,6 @@ func CollectTemperatureMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, me
 
 // CollectDeviceIdAsMetric collects the device id as a metric.
 func CollectDeviceIdAsMetric(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	deviceId, err := handle.GetIndex()
 	if err == nvml.SUCCESS {
 		metrics.DeviceIndex = deviceId
@@ -137,10 +115,6 @@ func CollectDeviceIdAsMetric(handle nvml.Device, metrics *GPUDeviceMetrics, metr
 
 
 func collectPStateMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	pState, err := handle.GetPerformanceState()
 	if err == nvml.SUCCESS {
 		metrics.GpuPState = int32(pState)
@@ -153,10 +127,6 @@ func collectPStateMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric 
 
 // collectMemoryClockMetrics collects the memory clock metrics for the GPU device.
 func collectMemoryClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	memoryClock, err := handle.GetClock(nvml.CLOCK_MEM, nvml.CLOCK_ID_CURRENT)
 	if err == nvml.SUCCESS {
 		metrics.GpuClock = memoryClock
@@ -168,10 +138,6 @@ func collectMemoryClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, me
 
 // collectMemoryClockMetrics collects the memory clock metrics for the GPU device.
 func collectGpuClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	memoryClock, err := handle.GetClock(nvml.CLOCK_SM, nvml.CLOCK_ID_CURRENT)
 	if err == nvml.SUCCESS {
 		metrics.GpuClock = memoryClock
@@ -182,10 +148,6 @@ func collectGpuClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metri
 }
 
 func collectGpuVideoClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	memoryClock, err := handle.GetClock(nvml.CLOCK_VIDEO, nvml.CLOCK_ID_CURRENT)
 	if err == nvml.SUCCESS {
 		metrics.GpuClock = memoryClock
@@ -196,10 +158,6 @@ func collectGpuVideoClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, 
 }
 
 func collectGpuGraphicsClockMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	memoryClock, err := handle.GetClock(nvml.CLOCK_GRAPHICS, nvml.CLOCK_ID_CURRENT)
 	if err == nvml.SUCCESS {
 		metrics.GpuClock = memoryClock
@@ -210,9 +168,6 @@ func collectGpuGraphicsClockMetrics(handle nvml.Device, metrics *GPUDeviceMetric
 }
 
 func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-    // if !isRegistered(metric) {
-    // 	return nvml.ERROR_NOT_SUPPORTED
-    // } @TODO Clean this up
 
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
@@ -223,10 +178,6 @@ func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetr
 }
 
 func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	// if !isRegistered(metric) {
-	// 	return nvml.ERROR_NOT_SUPPORTED
-	// }
-
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_UNCORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
 		metrics.GpuEccErrors = eccErrors
@@ -237,10 +188,6 @@ func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMe
 
 // @TODO Fix this not collecting the right value
 func collectFanSpeedMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	fans, err := handle.GetNumFans()
 	if err != nvml.SUCCESS || fans == 0 {
 		return err
@@ -254,10 +201,6 @@ func collectFanSpeedMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metri
 }
 
 func collectPeakFlopsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
-
 	// Retrieve max clock speed
 	maxClock, err := handle.GetMaxClockInfo(nvml.CLOCK_GRAPHICS)
 	if err != nvml.SUCCESS || maxClock == 0 {
@@ -285,7 +228,7 @@ func collectPeakFlopsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metr
 	// 1e15 is 1 PetaFLOP
 	// 1e12 is 1 TeraFLOP
 
-	// calculate in TFLOPS can d convert to PFLOPS in grafana
+	// calculate in TFLOPS convert to PFLOPS in grafana
 	pflops := effectiveFLOPS / 1e12
 
 	metrics.GpuPeakFlops = pflops
@@ -305,6 +248,7 @@ func collectComputeRunningProcesses(handle nvml.Device, metrics *GPUDeviceMetric
 		fmt.Printf("Process Info: %+v\n", processInfo.UsedGpuMemory)
 		fmt.Printf("Process Info: %+v\n", processInfo.GpuInstanceId)
 		fmt.Printf("Process Info: %+v\n", processInfo.ComputeInstanceId)
+		_ = metrics
 	}
 	return nvml.SUCCESS
 
