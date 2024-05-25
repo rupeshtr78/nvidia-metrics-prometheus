@@ -17,3 +17,6 @@
 
 - [x] Initial Commit
 - [x]
+
+## Notes
+- go build -a -o bin/nvidia-metrics ./cmd/main.go
