@@ -1,6 +1,4 @@
 # Nvidia Metrics
-wrire read me for the repository thats opened now
-# Open Repository: Nvidia Metrics
 
 The repository, `nvidia-metrics`, leverages the Nvidia Management Library (NVML), a C-based API that can interface with Nvidia GPUs. This repository gives a clear insight into the usage statistics of Nvidia GPUs like temperature, power consumption, memory usage, etc. It is intended for developers working on high performance computing, machine learning, and other GPU-intensive tasks.
 
@@ -41,12 +39,12 @@ make
 After the project has been compiled, run the resulting binary.
 
 ```bash
-./nvidiaMetrics
+./nvidiaMetrics --config config/metrics.yaml
 ```
 
 ## Built With
 
-- NVML - A C-based API for monitoring and managing Nvidia GPUs.
+- NVML - A C-based GO API for monitoring and managing Nvidia GPUs.
 - CUDA - A parallel computing platform and programming model developed by Nvidia for general computing on GPUs.
 
 ## Contributing
