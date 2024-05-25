@@ -15,9 +15,6 @@ import (
 func main() {
 	fmt.Println("Starting prometheus nvidia-metrics")
 
-	// Deletes the metric first
-	// prometheusmetrics.DeleteMetrics("config/metrics.yaml")
-
 	// Register the metrics with Prometheus
 	err := prometheusmetrics.CreatePrometheusMetrics("config/metrics.yaml")
 	if err != nil {
@@ -26,12 +23,12 @@ func main() {
 	}
 	//
 	//// run the metrics server
-	//api.RunMetrics()
 	api.RunPrometheusMetricsServer()
-	//// RunMetricsLocal()
+
 
 }
 
+// @TODO - Remove this function for testing only
 func RunMetricsLocal() {
 
 	// Initialize NVML before starting the metric collection loop
