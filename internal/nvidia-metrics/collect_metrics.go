@@ -65,10 +65,13 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 
 	// Collect Device Metrics
 
-	err = CollectTemperatureMetrics(handle, metrics, config.GPU_TEMPERATURE)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting temperature metrics", zap.Error(err))
+	if isRegistered(config.GPU_TEMPERATURE) {
+		err = CollectTemperatureMetrics(handle, metrics, config.GPU_TEMPERATURE)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting temperature metrics", zap.Error(err))
+		}
 	}
+
 
 	err = CollectUtilizationMetrics(handle, metrics)
 	if err != nvml.SUCCESS {
@@ -80,62 +83,90 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		logger.Error("Error collecting memory info metrics", zap.Error(err))
 	}
 
-	err = CollectPowerInfoMetrics(handle, metrics, config.GPU_POWER_USAGE)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting power info metrics", zap.Error(err))
+	if isRegistered(config.GPU_POWER_USAGE) {
+		err = CollectPowerInfoMetrics(handle, metrics, config.GPU_POWER_USAGE)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting power info metrics", zap.Error(err))
+		}
 	}
 
-	err = CollectRunningProcessMetrics(handle, metrics, config.GPU_RUNNING_PROCESS)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting running process metrics", zap.Error(err))
+    if isRegistered(config.GPU_RUNNING_PROCESS) {
+		err = CollectRunningProcessMetrics(handle, metrics, config.GPU_RUNNING_PROCESS)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting running process metrics", zap.Error(err))
+		}
+    }
+
+    if isRegistered(config.GPU_ID_METRIC) {
+		err = CollectDeviceIdAsMetric(handle, metrics, config.GPU_ID_METRIC)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting device id as metric", zap.Error(err))
+		}
+    }
+
+    if isRegistered(config.GPU_P_STATE) {
+		err = collectPStateMetrics(handle, metrics, config.GPU_P_STATE)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting p state metrics", zap.Error(err))
+		}
+    }
+
+	if isRegistered(config.GPU_ECC_CORRECTED_ERRORS) {
+		err = collectEccCorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_CORRECTED_ERRORS)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting ECC corrected errors metrics", zap.Error(err))
+		}
 	}
 
-	err = CollectDeviceIdAsMetric(handle, metrics, config.GPU_ID_METRIC)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting device id as metric", zap.Error(err))
-	}
+    if isRegistered(config.GPU_ECC_UNCORRECTED_ERRORS) {
+		err = collectEccUncorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_UNCORRECTED_ERRORS)
+		if err != nvml.SUCCESS{
+			logger.Error("Error collecting ECC uncorrected errors metrics", zap.Error(err))
+		}
+    }
 
-	err = collectPStateMetrics(handle, metrics, config.GPU_P_STATE)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting p state metrics", zap.Error(err))
-	}
+    if isRegistered(config.GPU_SM_CLOCK) {
+		err = collectGpuClockMetrics(handle, metrics, config.GPU_SM_CLOCK)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting GPU clock metrics", zap.Error(err))
+		}
+    }
 
-	err = collectEccCorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_CORRECTED_ERRORS)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting ECC corrected errors metrics", zap.Error(err))
-	}
+    if isRegistered(config.GPU_GRAPHICS_CLOCK) {
+		err = collectGpuGraphicsClockMetrics(handle, metrics, config.GPU_GRAPHICS_CLOCK)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting GPU graphics clock metrics", zap.Error(err))
+		}
+    }
 
-	err = collectEccUncorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_UNCORRECTED_ERRORS)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting ECC uncorrected errors metrics", zap.Error(err))
-	}
+    if isRegistered(config.GPU_VIDEO_CLOCK) {
+		err = collectGpuVideoClockMetrics(handle, metrics, config.GPU_VIDEO_CLOCK)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting GPU video clock metrics", zap.Error(err))
+		}
+    }
 
-	err = collectGpuClockMetrics(handle, metrics, config.GPU_SM_CLOCK)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting GPU clock metrics", zap.Error(err))
-	}
+    if isRegistered(config.GPU_MEMORY_CLOCK) {
+		err = collectMemoryClockMetrics(handle, metrics, config.GPU_MEMORY_CLOCK)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting memory clock metrics", zap.Error(err))
+		}
+    }
 
-	err = collectGpuGraphicsClockMetrics(handle, metrics, config.GPU_GRAPHICS_CLOCK)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting GPU graphics clock metrics", zap.Error(err))
-	}
-
-	err = collectGpuVideoClockMetrics(handle, metrics, config.GPU_VIDEO_CLOCK)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting GPU video clock metrics", zap.Error(err))
-	}
-
-	err = collectMemoryClockMetrics(handle, metrics, config.GPU_MEMORY_CLOCK)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting memory clock metrics", zap.Error(err))
-	}
-
-	err = collectFanSpeedMetrics(handle, metrics, config.GPU_FAN_SPEED)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting fan speed metrics", zap.Error(err))
-	}
+    if isRegistered(config.GPU_PEAK_FLOPS_METRIC) {
+		err = collectPeakFlopsMetrics(handle, metrics, config.GPU_PEAK_FLOPS_METRIC)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting peak flops metrics", zap.Error(err))
+		}
+    }
 
 	// @TODO Add more metrics here.
+
+	// @TODO Fix fan speed metrics
+	// err = collectFanSpeedMetrics(handle, metrics, config.GPU_FAN_SPEED)
+	// if err != nvml.SUCCESS {
+	// 	logger.Error("Error collecting fan speed metrics", zap.Error(err))
+	// }
 
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil

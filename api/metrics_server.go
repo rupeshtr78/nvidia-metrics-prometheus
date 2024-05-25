@@ -62,6 +62,7 @@ func StartPrometheusServer() error {
 
 }
 
+// @TODO Remove after testing
 // RunMetrics starts HTTP server on port 9500 to expose GPU metrics [Deprecated]
 func RunMetrics() {
 	// Initialize NVML before starting the metric collection loop
