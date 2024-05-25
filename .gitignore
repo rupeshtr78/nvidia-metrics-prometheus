@@ -37,3 +37,9 @@ vcs.xml
 
 # vscode
 .vscode/
+
+# Logs
+/logs/
+
+#Binary
+/bin/
