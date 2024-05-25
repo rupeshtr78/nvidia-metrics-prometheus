@@ -11,6 +11,7 @@
 - [ ] User Viper
 - [ ] User Cobra
 - [ ] Add Cli Ux
+- [ ] Add Detailed Readme
 
 ## Completed
 
