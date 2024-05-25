@@ -21,12 +21,16 @@ func RunServer() {
 	port := getEnv("PORT", "9500")
 	host := getEnv("HOST", "0.0.0.0")
 	interval := getEnv("INTERVAL", "5")
+	logFilePath := getEnv("LOG_FILE_PATH", "logs/gpu-metrics.log")
+	logToFile := getEnv("LOG_TO_FILE", "false")
 
 	flag.StringVar(&configFile, "config", configFile, "Path to the configuration file")
 	flag.StringVar(&logLevel, "loglevel", logLevel, "Log level (debug, info, warn, error,fatal)")
 	flag.StringVar(&port, "port", port, "Port to run the metrics server")
 	flag.StringVar(&host, "host", host, "Host to run the metrics server")
 	flag.StringVar(&interval, "interval", interval, "Time interval in seconds to scrape metrics")
+	flag.StringVar(&logFilePath, "logfile", logFilePath, "Log file path")
+	flag.StringVar(&logToFile, "filelog", logToFile, "Enable file logging")
 
 	flag.Parse()
 
@@ -34,16 +38,21 @@ func RunServer() {
 		log.Fatal("Config file is required")
 	}
 
+	fileLogBool, err := strconv.ParseBool(logToFile)
+	if err != nil {
+		log.Fatal("Failed to convert file log to boolean", err)
+	}
+
 	// Initialize the logger
-	err := logger.GetLogger(logLevel)
+	err = logger.GetLogger(logLevel, fileLogBool, logFilePath)
 	if err != nil {
 		log.Fatal("Failed to initialize logger", err)
 	}
 
-	filePath := filepath.Join(configFile)
+	metricsConfig := filepath.Join(configFile)
 
 	// Register the metrics with Prometheus
-	err = prometheusmetrics.CreatePrometheusMetrics(filePath)
+	err = prometheusmetrics.CreatePrometheusMetrics(metricsConfig)
 	if err != nil {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)

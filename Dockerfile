@@ -116,6 +116,8 @@ ENV LOG_LEVEL=info
 ENV PORT=9500
 ENV HOST=0.0.0.0
 ENV INTERVAL=5
+ENV LOG_FILE_PATH=/var/log/nvidia-metrics.log
+ENV LOG_TO_FILE=false
 
 EXPOSE $PORT
 # use tini to perform correct signal handling
