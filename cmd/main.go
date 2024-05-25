@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	configFile = flag.String("config", "", "Path to the configuration file")
+	configFile = flag.String("config", "config/metrics.yaml", "Path to the configuration file")
 	logLevel   = flag.String("log-level", "info", "Log level (debug, info, warn, error,fatal)")
 )
 
