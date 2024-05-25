@@ -1,22 +1,25 @@
-FROM golang:1.21.7-bullseye AS builder
+# https://hub.docker.com/_/golang/tags
+FROM golang:1.22.2-bullseye AS builder  
 ARG TARGETOS
 ARG TARGETARCH
-ARG PORT
-ARG HOST
 
 # Install required packages
 RUN set -ex; \
     apt-get update; \
-    apt-get -y install curl ca-certificates; \
+    apt-get install -y --no-install-recommends curl ca-certificates gcc; \
     update-ca-certificates; \
-    apt-get clean; \
-    apt-get autoremove --purge; \
-    rm -rf /var/lib/apt/lists/* /usr/share/man/* /usr/share/doc/*;
+    rm -rf /var/lib/apt/lists/*;
 
 RUN mkdir /app
 WORKDIR /app
 
 # RUN go env -w GOPRIVATE=*.
+
+# Copy the Go modules manifests
+COPY go.mod go.sum ./
+
+# Download Go modules
+RUN go mod download
 
 # Add content
 ADD . .
@@ -29,7 +32,7 @@ ADD . .
 # was called. For example, if we call make docker-build in a local env which has the Apple Silicon M1 SO
 # the docker BUILDPLATFORM arg will be linux/arm64 when for Apple x86 it will be linux/amd64. Therefore,
 # by leaving it empty we can ensure that the container and binary shipped on it will have the same platform.
-RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o nvidia-metrics ./cmd/main.go
+RUN CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -a -o nvidia-metrics ./cmd/main.go
 
 # Image to run the service in production
 FROM debian:bullseye-slim
