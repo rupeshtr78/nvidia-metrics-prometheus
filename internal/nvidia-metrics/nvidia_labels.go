@@ -65,6 +65,23 @@ func (lf LabelFunctions) AddFunctions() {
 		return cudaVersion, ret
 	})
 
+	lf.Add(config.GPU_PEAK_FLOPS.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		id, err := device.GetIndex()
+		if err != nvml.SUCCESS {
+			return 0, err
+		}
+
+		// Get device flops
+		flops, err := config.GetGpuFlops(id)
+		if err != nvml.SUCCESS || flops == 0 {
+			return 0, nvml.ERROR_UNKNOWN
+		}
+		// Convert flops to TFLOPS
+		tflops := flops / 1e12
+
+		return tflops, nvml.SUCCESS
+	})
+
 	// @TODO add additional label function to the map
 	//lf.Add(config.GPU_POWER.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 	//	operationMode, _, r := device.GetGpuOperationMode()

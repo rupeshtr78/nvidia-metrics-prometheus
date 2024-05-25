@@ -12,6 +12,7 @@ metrics:
       label7: gpu_cuda_version
       label8: gpu_sm_clock_max
       label9: gpu_graphics_clock
+      label10: gpu_peak_flops
 
 
   - name: gpu_name
