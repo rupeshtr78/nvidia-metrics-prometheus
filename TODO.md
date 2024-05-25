@@ -12,6 +12,7 @@
 - [ ] Use Flag
 - [ ] Add Cli Ux
 - [ ] Add Detailed Readme
+- [ ] Add env file
 
 ## Completed
 

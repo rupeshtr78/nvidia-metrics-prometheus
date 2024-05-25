@@ -77,6 +77,7 @@ COPY --chown=$USER_UID:$USER_GID --from=builder /app/manager /app/manager
 # Set up default configs path
 ENV APP_CONFIG_PATH /app/config
 
+EXPOSE 9500
 # use tini to perform correct signal handling
 ENTRYPOINT ["/tini", "--"]
 
