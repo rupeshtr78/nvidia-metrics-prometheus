@@ -19,7 +19,7 @@ func RunServer() {
 	configFile := getEnv("CONFIG_FILE", "config/metrics.yaml")
 	logLevel := getEnv("LOG_LEVEL", "info")
 	port := getEnv("PORT", "9500")
-	host := getEnv("HOST", "localhost")
+	host := getEnv("HOST", "0.0.0.0")
 	interval := getEnv("INTERVAL", "5")
 
 	flag.StringVar(&configFile, "config", configFile, "Path to the configuration file")

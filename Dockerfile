@@ -114,7 +114,7 @@ COPY --chown=$USER_UID:$USER_GID --from=builder /app/nvidia-metrics /app/nvidia-
 ENV CONFIG_FILE=/config/metrics.yaml
 ENV LOG_LEVEL=info
 ENV PORT=9500
-ENV HOST=localhost
+ENV HOST=0.0.0.0
 ENV INTERVAL=5
 
 EXPOSE $PORT

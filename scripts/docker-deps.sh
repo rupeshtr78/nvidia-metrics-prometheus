@@ -5,8 +5,6 @@
 # The NVIDIA Container Toolkit enables users to build and run GPU-accelerated containers. 
 # The toolkit includes a container runtime library and utilities to automatically configure containers to leverage NVIDIA GPUs.
 
-
-
 # Add the package repositories
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
@@ -67,3 +65,8 @@ sudo touch /run/nvidia/toolkit.pid
 sudo chmod 0755 /run/nvidia
 sudo chmod 777 /run/nvidia/toolkit.pid
 docker run --runtime=nvidia --rm nvcr.io/nvidia/k8s/container-toolkit:v1.15.0-ubi8 nvidia-smi
+
+
+# docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
