@@ -18,6 +18,7 @@ import (
 var (
 	configFile = flag.String("config", "config/metrics.yaml", "Path to the configuration file")
 	logLevel   = flag.String("log-level", "info", "Log level (debug, info, warn, error,fatal)")
+	port 	 = flag.String("port", "9500", "Port to run the metrics server")
 )
 
 func main() {
