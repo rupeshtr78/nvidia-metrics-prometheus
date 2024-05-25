@@ -54,7 +54,7 @@ func StartPrometheusServer(address string) error {
 		Handler:      promhttp.Handler(),
 	}
 
-	logger.Info("Starting Prometheus server on port 9500")
+	logger.Info("Starting Prometheus server", zap.String("address", address), zap.String("path", "/metrics"))
 
 	err := server.ListenAndServe()
 
