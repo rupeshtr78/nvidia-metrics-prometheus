@@ -15,8 +15,9 @@ import (
 // logger is the global logger instance.
 var logger *zap.Logger
 
-func init() {
-	err := GetLogger()
+// @TODO - remove after testing
+func Loggerinit(level string) {
+	err := GetLogger(level)
 
 	if err != nil {
 		fmt.Println(err)
@@ -24,14 +25,14 @@ func init() {
 
 }
 
-func GetLogger() (err error) {
+func GetLogger(level string) (err error) {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	config.InitialFields = map[string]interface{}{
 		"app": "nvidia-metrics",
 	}
-	config.Level = setLogLevel("warn")
+	config.Level = setLogLevel(level)
 
 	// Enable caller information reporting.
 	// Modify the EncoderConfig for the caller key and format
@@ -41,7 +42,7 @@ func GetLogger() (err error) {
 	logger, err = config.Build(zap.AddCallerSkip(1)) // Skip one level to account for this wrapper.
 
 	if err != nil {
-		err = fmt.Errorf("Failed to initialize logger: %v", err)
+		err = fmt.Errorf("failed to initialize logger: %v", err)
 		return err
 	}
 

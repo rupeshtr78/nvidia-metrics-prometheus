@@ -94,3 +94,9 @@ func GetGpuFlops(gpuId int) (float64, nvml.Return) {
 	}
 	return 0, nvml.ERROR_NOT_FOUND
 }
+
+const (
+	serverPort    = "9500"
+	serverPortEnv = "PORT"
+	host          = ""
+)

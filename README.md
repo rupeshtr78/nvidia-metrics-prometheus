@@ -42,6 +42,16 @@ After the project has been compiled, run the resulting binary.
 ./nvidiaMetrics --config config/metrics.yaml
 ```
 
+```bash
+docker run -e CONFIG_FILE=/path/to/config.yaml \
+           -e LOG_LEVEL=debug \
+           -e PORT=8080 \
+           -e HOST=0.0.0.0 \
+           -e INTERVAL=10 \
+           your-image-name
+
+```
+
 ## Built With
 
 - NVML - A C-based GO API for monitoring and managing Nvidia GPUs.

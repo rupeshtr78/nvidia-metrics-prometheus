@@ -20,16 +20,16 @@ var (
 	})
 )
 
-func RunPrometheusMetricsServer() {
+func RunPrometheusMetricsServer(address string, interval time.Duration) {
 	// Initialize NVML before starting the metric collection loop
 	nvidiaMetrics.InitNVML()
 	defer nvidiaMetrics.ShutdownNVML()
 
 	// Start collecting GPU metrics every 5 seconds
-	startMetricsCollection(5 * time.Second)
+	startMetricsCollection(interval)
 
 	// Start the HTTP server to expose metrics
-	err := StartPrometheusServer()
+	err := StartPrometheusServer(address)
 	if err != nil {
 		logger.Fatal("HTTP server failed", zap.Error(err))
 	}
@@ -46,15 +46,15 @@ func startMetricsCollection(interval time.Duration) {
 	}()
 }
 
-func StartPrometheusServer() error {
+func StartPrometheusServer(address string) error {
 	server := &http.Server{
-		Addr:         ":9500",
+		Addr:         address,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		Handler:      promhttp.Handler(),
 	}
 
-	logger.Info("Starting Prometheus server on port 9500")
+	logger.Info("Starting Prometheus server", zap.String("address", address), zap.String("path", "/metrics"))
 
 	err := server.ListenAndServe()
 
