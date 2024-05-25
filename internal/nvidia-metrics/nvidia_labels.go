@@ -45,6 +45,11 @@ func (lf LabelFunctions) AddFunctions() {
 		return clock, ret
 	})
 
+	lf.Add(config.GPU_GRAPHICS_CLOCK_MAX.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
+		clock, ret := device.GetMaxClockInfo(nvml.CLOCK_GRAPHICS)
+		return clock, ret
+	})
+
 	lf.Add(config.GPU_CORES.GetLabel(), func(device nvml.Device) (any, nvml.Return) {
 		cores, ret := device.GetNumGpuCores()
 		return cores, ret

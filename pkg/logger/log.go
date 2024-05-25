@@ -31,7 +31,7 @@ func GetLogger() (err error) {
 	config.InitialFields = map[string]interface{}{
 		"app": "nvidia-metrics",
 	}
-	config.Level = setLogLevel("debug")
+	config.Level = setLogLevel("warn")
 
 	// Enable caller information reporting.
 	// Modify the EncoderConfig for the caller key and format

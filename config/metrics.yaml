@@ -11,6 +11,7 @@ metrics:
       label6: gpu_driver_version
       label7: gpu_cuda_version
       label8: gpu_sm_clock_max
+      label9: gpu_graphics_clock
 
 
   - name: gpu_name
@@ -133,3 +134,11 @@ metrics:
     labels:
       label1: gpu_id
       label2: gpu_name
+
+  - name: gpu_peak_flops_metric
+    type: gauge
+    help: "Peak FLOPS of the GPU."
+    labels:
+      label1: gpu_id
+      label2: gpu_name
+      label3: gpu_cores

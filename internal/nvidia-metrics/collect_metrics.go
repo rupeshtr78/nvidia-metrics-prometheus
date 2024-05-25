@@ -130,12 +130,18 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		logger.Error("Error collecting memory clock metrics", zap.Error(err))
 	}
 
-	err = collectFanSpeedMetrics(handle, metrics, config.GPU_FAN_SPEED)
+	err = collectPeakFlopsMetrics(handle, metrics, config.GPU_PEAK_FLOPS_METRIC)
 	if err != nvml.SUCCESS {
-		logger.Error("Error collecting fan speed metrics", zap.Error(err))
+		logger.Error("Error collecting peak flops metrics", zap.Error(err))
 	}
 
 	// @TODO Add more metrics here.
+
+	// @TODO Fix fan speed metrics
+	// err = collectFanSpeedMetrics(handle, metrics, config.GPU_FAN_SPEED)
+	// if err != nvml.SUCCESS {
+	// 	logger.Error("Error collecting fan speed metrics", zap.Error(err))
+	// }
 
 	logger.Debug("Collected GPU metrics", zap.Int("device_index", deviceIndex))
 	return metrics, nil

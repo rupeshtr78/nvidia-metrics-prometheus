@@ -22,6 +22,7 @@ type GPUDeviceMetrics struct {
 	GpuClock            uint32
 	GpuEccErrors        uint64
 	GpuFanSpeed         uint32
+	GpuPeakFlops        float64
 }
 
 // CollectDeviceMetrics collects all the metrics for the GPU device.
@@ -195,6 +196,43 @@ func collectFanSpeedMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metri
 		metrics.GpuFanSpeed = fanSpeed
 		SetDeviceMetric(handle, metric, float64(fanSpeed))
 	}
+	return err
+}
+
+func collectPeakFlopsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
+	// Retrieve max clock speed
+	maxClock, err := handle.GetMaxClockInfo(nvml.CLOCK_GRAPHICS)
+	if err != nvml.SUCCESS || maxClock == 0 {
+		return err
+	}
+
+	currentClock, err := handle.GetClockInfo(nvml.CLOCK_GRAPHICS)
+	if err != nvml.SUCCESS || currentClock == 0 {
+		return err
+	}
+
+	deviceId, err := handle.GetIndex()
+	if err != nvml.SUCCESS {
+		return err
+	}
+
+	// get device flops
+	peakFlops, err := config.GetGpuFlops(deviceId)
+	if err != nvml.SUCCESS || peakFlops == 0 {
+		return err
+	}
+
+	// Calculate effective FLOPS
+	effectiveFLOPS := float64(currentClock) / float64(maxClock) * peakFlops
+	// 1e15 is 1 PetaFLOP
+	// 1e12 is 1 TeraFLOP
+
+	// calculate in TFLOPS can d convert to PFLOPS in grafana
+	pflops := effectiveFLOPS / 1e12
+
+	metrics.GpuPeakFlops = pflops
+	SetDeviceMetric(handle, metric, pflops)
+
 	return err
 }
 
