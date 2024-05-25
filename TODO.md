@@ -2,8 +2,7 @@
 
 ## In Progress
 
-- [ ] Initial Commit
-- [ ] Grafana Dashboard
+
 - [ ] Add Unit Tests
 - [ ] Prometheus Monitoring
 - [ ] Docker
@@ -12,12 +11,12 @@
 - [ ] Use Flag
 - [ ] Add Cli Ux
 - [ ] Add Detailed Readme
-- [ ] Add env file
+- [ ] Add env var for prometheus addr
 
 ## Completed
 
 - [x] Initial Commit
-- [x]
+- [x] Grafana Dashboard
 
 ## Notes
 - go build -a -o bin/nvidia-metrics ./cmd/main.go
