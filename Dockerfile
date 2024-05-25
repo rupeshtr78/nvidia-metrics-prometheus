@@ -35,7 +35,7 @@ ADD . .
 RUN CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -a -o nvidia-metrics ./cmd/main.go
 
 # Image to run the service in production
-FROM debian:bullseye-slim
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 
 # add git commit label
 ARG GIT_COMMIT=unspecified
@@ -43,14 +43,40 @@ LABEL git_commit=$GIT_COMMIT
 
 # add required trusted root CA
 
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN echo "keyboard-configuration keyboard-configuration/layout select US" | debconf-set-selections 
+RUN echo "keyboard-configuration keyboard-configuration/variant select English (US)" | debconf-set-selections 
+RUN echo "keyboard-configuration keyboard-configuration/modelcode select pc105" | debconf-set-selections
+
 # Install required packages
 RUN set -ex; \
     apt-get update; \
-    apt-get -y install curl daemontools ca-certificates; \
+    apt-get -y install curl daemontools ca-certificates software-properties-common; \
+    add-apt-repository ppa:graphics-drivers/ppa; \
+    apt-get update; \
+    apt-get -y install nvidia-driver-390;\
     update-ca-certificates; \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    freeglut3-dev \
+    libx11-dev \
+    libxmu-dev \
+    libxi-dev \
+    libnuma-dev \
+    libbz2-1.0 \
+    libbz2-dev \
+    libbz2-ocaml \
+    libbz2-ocaml-dev \
+    libssl-dev \
+    openssl \
+    librdmacm-dev \
+    libibverbs-dev \
+    libgtk2.0-dev; \
     apt-get clean; \
     apt-get autoremove --purge; \
     rm -rf /var/lib/apt/lists/* /usr/share/man/* /usr/share/doc/*;
+
+
 
 # Install tini https://github.com/krallin/tini as signal handler
 # tini handles the reaping of zombie processes and to forward signals correctly to subprocesses.
@@ -61,6 +87,9 @@ RUN chmod +x /tini
 # Create a non-root user and group with a writeable home directory
 # These UID/GID values should match who we run the container as
 WORKDIR /app
+RUN mkdir /config
+COPY config/metrics.yaml /config/metrics.yaml
+
 # add non-root user
 ARG USER_NAME=user
 ARG USER_UID=999
@@ -74,6 +103,7 @@ RUN groupadd --gid $USER_GID $USER_NAME \
     && chmod 0440 /etc/sudoers.d/$USER_NAME
 
 RUN chown -R $USER_NAME: /app
+RUN chown -R $USER_NAME: /config
 # set user
 USER $USER_NAME
 
@@ -81,7 +111,7 @@ COPY --chown=$USER_UID:$USER_GID --from=builder /app/nvidia-metrics /app/nvidia-
 
 
 # Set environment variables with default values
-ENV CONFIG_FILE=config/metrics.yaml
+ENV CONFIG_FILE=/config/metrics.yaml
 ENV LOG_LEVEL=info
 ENV PORT=9500
 ENV HOST=localhost
