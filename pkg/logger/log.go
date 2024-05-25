@@ -16,7 +16,8 @@ import (
 var logger *zap.Logger
 
 func init() {
-	err := GetLogger()
+	level := "info"
+	err := GetLogger(level)
 
 	if err != nil {
 		fmt.Println(err)
@@ -24,14 +25,14 @@ func init() {
 
 }
 
-func GetLogger() (err error) {
+func GetLogger(level string) (err error) {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	config.InitialFields = map[string]interface{}{
 		"app": "nvidia-metrics",
 	}
-	config.Level = setLogLevel("warn")
+	config.Level = setLogLevel(level)
 
 	// Enable caller information reporting.
 	// Modify the EncoderConfig for the caller key and format
