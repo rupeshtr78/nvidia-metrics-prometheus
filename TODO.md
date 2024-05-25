@@ -9,10 +9,14 @@
 - [ ] Docker
 - [ ] Docker Compose
 - [ ] User Viper
-- [ ] User Cobra
+- [ ] Use Flag
 - [ ] Add Cli Ux
+- [ ] Add Detailed Readme
 
 ## Completed
 
 - [x] Initial Commit
 - [x]
+
+## Notes
+- go build -a -o bin/nvidia-metrics ./cmd/main.go

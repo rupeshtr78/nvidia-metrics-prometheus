@@ -1,10 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"github.com/rupeshtr78/nvidia-metrics/api"
+	"flag"
+	"log"
 	"os"
+	"path/filepath"
 	"time"
+
+	"github.com/rupeshtr78/nvidia-metrics/api"
 
 	nvidiametrics "github.com/rupeshtr78/nvidia-metrics/internal/nvidia-metrics"
 	prometheusmetrics "github.com/rupeshtr78/nvidia-metrics/internal/prometheus_metrics"
@@ -12,16 +15,28 @@ import (
 	"go.uber.org/zap"
 )
 
-func main() {
-	fmt.Println("Starting prometheus nvidia-metrics")
+var (
+	configFile = flag.String("config", "config/metrics.yaml", "Path to the configuration file")
+	logLevel   = flag.String("log-level", "info", "Log level (debug, info, warn, error,fatal)")
+)
 
-	// Register the metrics with Prometheus
-	err := prometheusmetrics.CreatePrometheusMetrics("config/metrics.yaml")
+func main() {
+	flag.Parse()
+
+	if *configFile == "" {
+		log.Fatal("Config file is required")
+	}
+
+	filePath := filepath.Join(*configFile)
+
+	// Register the metrics with Prometheus and start the metrics server
+	// provide --config "config/metrics.yaml"
+	err := prometheusmetrics.CreatePrometheusMetrics(filePath)
 	if err != nil {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)
 	}
-	//
+
 	//// run the metrics server
 	api.RunPrometheusMetricsServer()
 
