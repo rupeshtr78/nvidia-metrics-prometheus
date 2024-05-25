@@ -65,9 +65,11 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 
 	// Collect Device Metrics
 
-	err = CollectTemperatureMetrics(handle, metrics, config.GPU_TEMPERATURE)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting temperature metrics", zap.Error(err))
+	if isRegistered(config.GPU_TEMPERATURE) {
+		err = CollectTemperatureMetrics(handle, metrics, config.GPU_TEMPERATURE)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting temperature metrics", zap.Error(err))
+		}
 	}
 
 	err = CollectUtilizationMetrics(handle, metrics)
@@ -100,15 +102,19 @@ func collectDeviceMetrics(deviceIndex int) (*GPUDeviceMetrics, error) {
 		logger.Error("Error collecting p state metrics", zap.Error(err))
 	}
 
-	err = collectEccCorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_CORRECTED_ERRORS)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting ECC corrected errors metrics", zap.Error(err))
+	if isRegistered(config.GPU_ECC_CORRECTED_ERRORS) {
+		err = collectEccCorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_CORRECTED_ERRORS)
+		if err != nvml.SUCCESS {
+			logger.Error("Error collecting ECC corrected errors metrics", zap.Error(err))
+		}
 	}
 
-	err = collectEccUncorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_UNCORRECTED_ERRORS)
-	if err != nvml.SUCCESS {
-		logger.Error("Error collecting ECC uncorrected errors metrics", zap.Error(err))
-	}
+    if isRegistered(config.GPU_ECC_UNCORRECTED_ERRORS) {
+		err = collectEccUncorrectedErrorsMetrics(handle, metrics, config.GPU_ECC_UNCORRECTED_ERRORS)
+		if err != nvml.SUCCESS{
+			logger.Error("Error collecting ECC uncorrected errors metrics", zap.Error(err))
+		}
+    }
 
 	err = collectGpuClockMetrics(handle, metrics, config.GPU_SM_CLOCK)
 	if err != nvml.SUCCESS {

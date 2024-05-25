@@ -210,9 +210,9 @@ func collectGpuGraphicsClockMetrics(handle nvml.Device, metrics *GPUDeviceMetric
 }
 
 func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-    if !isRegistered(metric) {
-    	return nvml.ERROR_NOT_SUPPORTED
-    }
+    // if !isRegistered(metric) {
+    // 	return nvml.ERROR_NOT_SUPPORTED
+    // } @TODO Clean this up
 
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_CORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
@@ -223,9 +223,9 @@ func collectEccCorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetr
 }
 
 func collectEccUncorrectedErrorsMetrics(handle nvml.Device, metrics *GPUDeviceMetrics, metric config.Metric) nvml.Return {
-	if !isRegistered(metric) {
-		return nvml.ERROR_NOT_SUPPORTED
-	}
+	// if !isRegistered(metric) {
+	// 	return nvml.ERROR_NOT_SUPPORTED
+	// }
 
 	eccErrors, err := handle.GetTotalEccErrors(nvml.MEMORY_ERROR_TYPE_UNCORRECTED, nvml.VOLATILE_ECC)
 	if err == nvml.SUCCESS {
