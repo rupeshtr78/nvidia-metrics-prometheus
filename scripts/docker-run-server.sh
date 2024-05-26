@@ -19,3 +19,11 @@ sudo ufw reload
 
 # Verify that the port is open
 sudo netstat -tuln | grep 9500
+
+chmod 777 logs
+
+docker-compose config --services
+docker-compose rm -f nvidia-gpu-exporter
+docker-compose up -d > /dev/null 2>&1
+docker-compose up -d > logs/nvidia-metrics.log 2>&1
+docker-compose ps
