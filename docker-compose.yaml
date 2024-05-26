@@ -3,7 +3,7 @@ services:
   nvidia-gpu-exporter:
     image: nvidia-gpu-exporter:1.2
     environment:
-      LOG_LEVEL: debug
+      LOG_LEVEL: error
       PORT: 9500
       HOST: 0.0.0.0
       INTERVAL: 5
