@@ -87,7 +87,8 @@ RUN chmod +x /tini
 # Create a non-root user and group with a writeable home directory
 # These UID/GID values should match who we run the container as
 WORKDIR /app
-RUN mkdir /config
+RUN mkdir /config \
+    && mkdir /logs
 COPY config/metrics.yaml /config/metrics.yaml
 
 # add non-root user
@@ -102,8 +103,10 @@ RUN groupadd --gid $USER_GID $USER_NAME \
     && echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
     && chmod 0440 /etc/sudoers.d/$USER_NAME
 
-RUN chown -R $USER_NAME: /app
-RUN chown -R $USER_NAME: /config
+RUN chown -R $USER_NAME: /app && \
+    chown -R $USER_NAME: /config && \
+    chown -R $USER_NAME: /logs
+
 # set user
 USER $USER_NAME
 
@@ -116,6 +119,8 @@ ENV LOG_LEVEL=info
 ENV PORT=9500
 ENV HOST=0.0.0.0
 ENV INTERVAL=5
+ENV LOG_FILE_PATH=/logs/nvidia-metrics.log
+ENV LOG_TO_FILE=false
 
 EXPOSE $PORT
 # use tini to perform correct signal handling

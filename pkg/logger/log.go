@@ -7,6 +7,7 @@ package logger
 
 import (
 	"fmt"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -16,8 +17,8 @@ import (
 var logger *zap.Logger
 
 // @TODO - remove after testing
-func Loggerinit(level string) {
-	err := GetLogger(level)
+func Loggerinit(level string, fileLog bool, filePath string) {
+	err := GetLogger(level, fileLog, filePath)
 
 	if err != nil {
 		fmt.Println(err)
@@ -25,7 +26,7 @@ func Loggerinit(level string) {
 
 }
 
-func GetLogger(level string) (err error) {
+func GetLogger(level string, fileLog bool, filePath string) (err error) {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -37,7 +38,15 @@ func GetLogger(level string) (err error) {
 	// Enable caller information reporting.
 	// Modify the EncoderConfig for the caller key and format
 	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder // Use ShortCallerEncoder to log the relative path
-	config.EncoderConfig.CallerKey = "caller"                      // Specify the key used for the caller in structured logs
+	config.EncoderConfig.CallerKey = "caller"
+
+	if fileLog {
+		config.OutputPaths = []string{"stdout", filePath}
+		config.ErrorOutputPaths = []string{"stderr", filePath}
+	} else {
+		config.OutputPaths = []string{"stdout"}
+		config.ErrorOutputPaths = []string{"stderr"}
+	}
 
 	logger, err = config.Build(zap.AddCallerSkip(1)) // Skip one level to account for this wrapper.
 
@@ -48,6 +57,40 @@ func GetLogger(level string) (err error) {
 
 	return nil
 
+}
+
+// // Configure the logger to write to the file
+func configureZapCore(fileName string) zapcore.Core {
+	// Create a file for logging
+	file, err := createLogFile(fileName)
+	if err != nil {
+		fmt.Println("Failed to create log file: ", err)
+	}
+
+	// Configure the encoder
+	encoderCfg := zap.NewProductionEncoderConfig()
+
+	// Create a new JSON encoder
+	encoder := zapcore.NewJSONEncoder(encoderCfg)
+
+	// Create a new core
+	writeSyncer := zapcore.AddSync(file)
+
+	// Create a new core
+	core := zapcore.NewCore(encoder, writeSyncer, zap.InfoLevel)
+
+	return core
+
+}
+
+func createLogFile(fileName string) (zapcore.WriteSyncer, error) {
+	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return zapcore.AddSync(file), nil
 }
 
 func Info(message string, fields ...zap.Field) {

@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetLogger(t *testing.T) {
-	err := GetLogger("info")
+	err := GetLogger("info", false, "")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}

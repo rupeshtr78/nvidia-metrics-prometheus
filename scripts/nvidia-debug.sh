@@ -70,3 +70,7 @@ docker run --runtime=nvidia --rm nvcr.io/nvidia/k8s/container-toolkit:v1.15.0-ub
 # docker-compose
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+docker-compose up -d > /dev/null 2>&1
+docker-compose up -d > logs/nvidia-metrics.log 2>&1
+docker-compose ps
