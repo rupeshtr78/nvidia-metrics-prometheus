@@ -11,3 +11,4 @@ export LOG_TO_FILE="false"
 
 # Running the server
 go run cmd/main.go
+
