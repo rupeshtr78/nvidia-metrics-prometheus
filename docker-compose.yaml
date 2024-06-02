@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   nvidia-gpu-exporter:
+    restart: always
     image: nvidia-gpu-exporter:1.2
     environment:
       LOG_LEVEL: error
