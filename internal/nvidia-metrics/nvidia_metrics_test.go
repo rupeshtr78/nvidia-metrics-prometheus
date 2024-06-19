@@ -28,6 +28,8 @@ var _ = Describe("GPUDeviceMetrics", func() {
 	BeforeEach(func() {
 		gpuDeviceMetrics = &GPUDeviceMetrics{}
 		mockHandle = new(MockNvmlDevice)
+		InitNVML()
+		defer ShutdownNVML()
 	})
 
 	Context("CollectUtilizationMetrics", func() {
