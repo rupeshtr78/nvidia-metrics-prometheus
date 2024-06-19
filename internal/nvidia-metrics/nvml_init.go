@@ -6,6 +6,24 @@ import (
 	"go.uber.org/zap"
 )
 
+type GpuDevice interface {
+	Init() nvml.Return
+	Shutdown() nvml.Return
+	GetIndex() (int, nvml.Return)
+	GetDeviceCount() (int, nvml.Return)
+	GetDeviceHandleByIndex(int) (nvml.Device, nvml.Return)
+	GetUtilizationRates() (nvml.Utilization, nvml.Return)
+	GetMemoryInfo() (nvml.Memory, nvml.Return)
+	GetPowerUsage() (uint32, nvml.Return)
+	GetRunningProcesses() ([]nvml.ProcessInfo, nvml.Return)
+	GetTemperature() (uint, nvml.Return)
+	GetClockInfo() (uint32, nvml.Return)
+	GetEccErrors() (nvml.EccErrorCounts, nvml.Return)
+	GetFanSpeed() (uint32, nvml.Return)
+	GetPeakFlops() (float64, nvml.Return)
+	GetPerformanceState() (nvml.Pstates, nvml.Return)
+}
+
 // GPUDeviceMetrics represents the collected metrics for a GPU device.
 type GPUDeviceMetrics struct {
 	DeviceIndex         int
