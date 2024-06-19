@@ -10,6 +10,25 @@ The repository, `nvidia-metrics`, leverages the Nvidia Management Library (NVML)
 
 These instructions will provide you a guideline for installing prerequisites, running the application, and building necessary files.
 
+Usage
+
+```
+  -config string
+        Path to the configuration file (default "config/metrics.yaml")
+  -filelog string
+        Enable file logging (default "false")
+  -host string
+        Host to run the metrics server (default "0.0.0.0")
+  -interval string
+        Time interval in seconds to scrape metrics (default "5")
+  -logfile string
+        Log file path (default "logs/gpu-metrics.log")
+  -loglevel string
+        Log level (debug, info, warn, error,fatal) (default "info")
+  -port string
+        Port to run the metrics server (default "9500")
+```
+
 ### Prerequisites
 
 To use this repository, you should have the Nvidia CUDA toolkit installed on your system.
