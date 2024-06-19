@@ -1,6 +1,9 @@
 # Nvidia Metrics
 
-The repository, `nvidia-metrics`, leverages the Nvidia Management Library (NVML), a C-based API that can interface with Nvidia GPUs. This repository gives a clear insight into the usage statistics of Nvidia GPUs like temperature, power consumption, memory usage, etc. It is intended for developers working on high performance computing, machine learning, and other GPU-intensive tasks.
+The repository, `nvidia-metrics`, leverages the Nvidia Management Library (NVML), a C-based API that can interface with Nvidia GPUs. This repository gives a clear insight into the usage statistics of Nvidia GPUs like temperature, power consumption, memory usage, etc. It is intended for developers working on high performance computing, machine learning, and other GPU-intensive tasks. The gathered metrics are transmitted to Prometheus and Grafana for visualization.
+
+![Nvidia Grafana Image](scripts/nvidia-grafana.png)
+
 
 ## Getting Started
 
