@@ -13,7 +13,7 @@ import (
 
 func isRegistered(metric config.Metric) bool {
 	if _, ok := prometheusmetrics.RegisteredMetrics[metric.GetMetric()]; !ok {
-		logger.Warn("metric not registered", zap.String("metric", metric.GetMetric()))
+		logger.Debug("metric not registered", zap.String("metric", metric.GetMetric()))
 		return false
 	}
 	return true
