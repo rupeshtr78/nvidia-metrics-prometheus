@@ -52,11 +52,11 @@ func RunServer() {
 
 	metricsConfig := filepath.Join(configFile)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	ctxCreateMetrics, cancelCreateMetrics := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelCreateMetrics()
 
 	// Register the metrics with Prometheus
-	err = prometheusmetrics.CreatePrometheusMetrics(ctx, metricsConfig)
+	err = prometheusmetrics.CreatePrometheusMetrics(ctxCreateMetrics, metricsConfig)
 	if err != nil {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)
@@ -77,8 +77,13 @@ func RunServer() {
 		scrapreInterval = time.Duration(t) * time.Second
 	}
 
+	// Start the metrics server with a long-running context
+	// ctxRunServer uses context.WithCancel to ensure the server can run indefinitely until explicitly canceled.
+	ctxRunServer, cancelRunServer := context.WithCancel(context.Background())
+	defer cancelRunServer()
+
 	// start the metrics server
-	api.RunPrometheusMetricsServer(ctx, address, scrapreInterval)
+	api.RunPrometheusMetricsServer(ctxRunServer, address, scrapreInterval)
 }
 
 // getEnv reads an environment variable or returns a default value.
