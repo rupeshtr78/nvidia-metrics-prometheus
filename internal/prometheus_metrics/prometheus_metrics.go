@@ -1,7 +1,9 @@
 package prometheusmetrics
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/logger"
 	"github.com/rupeshtr78/nvidia-metrics/pkg/utils"
@@ -12,7 +14,7 @@ var RegisteredMetrics = CreateMetricsMap()
 var RegisteredLabels = CreateLabelsMap()
 
 // RegisterMetric NewGaugeVec creates a new gauge vector and registers it with Prometheus.
-func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
+func RegisterMetric(ctx context.Context, gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 	if gpuMetric.Type != "gauge" {
 		err := fmt.Errorf("unsupported metric type: %s", gpuMetric.Type)
 		logger.Error("unsupported metric type", zap.String("type", gpuMetric.Type))
@@ -39,10 +41,17 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 		logger.Warn("metric was already registered", zap.String("metric", gpuMetric.Name.GetMetric()))
 	}
 
-	err = prometheus.Register(gaugeVec)
-	if err != nil {
-		logger.Error("failed to register metric", zap.Error(err))
-		return nil, err
+	// Register the metric with Prometheus
+	select {
+	case <-ctx.Done():
+		logger.Error("context cancelled", zap.String("metric", gpuMetric.Name.GetMetric()))
+		return nil, ctx.Err()
+	default:
+		err = prometheus.Register(gaugeVec)
+		if err != nil {
+			logger.Error("failed to register metric", zap.Error(err))
+			return nil, err
+		}
 	}
 
 	logger.Info("Verified registration of", zap.String("metric", gpuMetric.Name.GetMetric()))
@@ -50,10 +59,9 @@ func RegisterMetric(gpuMetric GpuMetric) (*prometheus.GaugeVec, error) {
 }
 
 // CreatePrometheusMetrics reads from config/metrics.yaml and create prometheus metrics
-func CreatePrometheusMetrics(filePath string) error {
+func CreatePrometheusMetrics(ctx context.Context, filePath string) error {
 	var m Metrics
 	// 	// read from config/metrics.yaml
-
 	err := utils.LoadFromYAMLV2(filePath, &m)
 	if err != nil {
 		return err
@@ -66,7 +74,7 @@ func CreatePrometheusMetrics(filePath string) error {
 
 	// create prometheus metrics from yaml
 	for _, metric := range m.MetricList {
-		gaugeVec, err := RegisterMetric(metric)
+		gaugeVec, err := RegisterMetric(ctx, metric)
 		if err != nil {
 			return err
 		}

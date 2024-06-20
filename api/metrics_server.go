@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
@@ -20,13 +21,13 @@ var (
 	})
 )
 
-func RunPrometheusMetricsServer(address string, interval time.Duration) {
+func RunPrometheusMetricsServer(ctx context.Context, address string, interval time.Duration) {
 	// Initialize NVML before starting the metric collection loop
 	nvidiaMetrics.InitNVML()
 	defer nvidiaMetrics.ShutdownNVML()
 
 	// Start collecting GPU metrics every 5 seconds
-	startMetricsCollection(interval)
+	startMetricsCollection(ctx, interval)
 
 	// Start the HTTP server to expose metrics
 	err := StartPrometheusServer(address)
@@ -35,12 +36,12 @@ func RunPrometheusMetricsServer(address string, interval time.Duration) {
 	}
 }
 
-func startMetricsCollection(interval time.Duration) {
+func startMetricsCollection(ctx context.Context, interval time.Duration) {
 	go func() {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 		for range ticker.C {
-			nvidiaMetrics.CollectGpuMetrics()
+			nvidiaMetrics.CollectGpuMetrics(ctx)
 			opsProcessed.Inc()
 		}
 	}()
@@ -71,10 +72,12 @@ func RunMetrics() {
 
 	http.Handle("/metrics", promhttp.Handler())
 
+	ctx := context.TODO()
+
 	// Start a separate goroutine for collecting metrics at regular intervals
 	go func() {
 		for {
-			nvidiaMetrics.CollectGpuMetrics()
+			nvidiaMetrics.CollectGpuMetrics(ctx)
 			time.Sleep(5 * time.Second)
 		}
 	}()
