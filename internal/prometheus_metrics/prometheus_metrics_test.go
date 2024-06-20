@@ -1,10 +1,12 @@
 package prometheusmetrics
 
 import (
+	"context"
 	"fmt"
-	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 	"os"
 	"testing"
+
+	"github.com/rupeshtr78/nvidia-metrics/internal/config"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -12,6 +14,8 @@ import (
 // mock logger
 
 var getGPuLabelsFunc func(GpuLabels) ([]string, error)
+
+var ctx = context.TODO()
 
 func TestRegisterMetric(t *testing.T) {
 
@@ -79,7 +83,7 @@ func TestRegisterMetric(t *testing.T) {
 			}
 
 			// Act
-			gaugeVec, err := RegisterMetric(tt.gpuMetric)
+			gaugeVec, err := RegisterMetric(ctx, tt.gpuMetric)
 
 			// Assert
 			if tt.expectError {
@@ -106,7 +110,7 @@ metrics:
 
 	_ = os.WriteFile(tmpFilePath2, []byte(content), 0666)
 
-	err := CreatePrometheusMetrics(tmpFilePath2)
+	err := CreatePrometheusMetrics(ctx, tmpFilePath2)
 
 	m := RegisteredMetrics
 	got, _ := m.GetMetric("gpu_name_test")
@@ -115,7 +119,7 @@ metrics:
 }
 
 func TestCreatePrometheusMetrics_WithInvalidFile(t *testing.T) {
-	err := CreatePrometheusMetrics("nonexistent.yaml")
+	err := CreatePrometheusMetrics(ctx, "nonexistent.yaml")
 
 	assert.Error(t, err, "error opening file")
 }
@@ -132,7 +136,7 @@ metrics:
 
 	_ = os.WriteFile(tmpFilePath2, []byte(content), 0666)
 
-	err := CreatePrometheusMetrics(tmpFilePath2)
+	err := CreatePrometheusMetrics(ctx, tmpFilePath2)
 
 	assert.Error(t, err)
 }
@@ -143,7 +147,7 @@ func TestCreatePrometheusMetrics_WithNoMetrics(t *testing.T) {
 	content := []byte("metricList: []")
 	_ = os.WriteFile(tmpfile, []byte(content), 0666)
 
-	err := CreatePrometheusMetrics(tmpfile)
+	err := CreatePrometheusMetrics(ctx, tmpfile)
 
 	assert.Error(t, err)
 }
@@ -160,7 +164,7 @@ metrics:
 
 	_ = os.WriteFile(tmpFilePath2, []byte(content), 0666)
 
-	err := CreatePrometheusMetrics(tmpFilePath2)
+	err := CreatePrometheusMetrics(ctx, tmpFilePath2)
 
 	assert.Error(t, err)
 }

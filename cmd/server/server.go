@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -51,8 +52,11 @@ func RunServer() {
 
 	metricsConfig := filepath.Join(configFile)
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	// Register the metrics with Prometheus
-	err = prometheusmetrics.CreatePrometheusMetrics(metricsConfig)
+	err = prometheusmetrics.CreatePrometheusMetrics(ctx, metricsConfig)
 	if err != nil {
 		logger.Fatal("Failed to create Prometheus metrics", zap.Error(err))
 		os.Exit(1)
