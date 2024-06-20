@@ -1,13 +1,7 @@
 # To-Do List
 
 ## In Progress
-
-
 - [ ] Add Unit Tests
-- [ ] Use Viper
-- [ ] Add Cli Ux
-- [ ] Add Detailed Readme
-- [ ] Read me go template
 
 ## Completed
 
