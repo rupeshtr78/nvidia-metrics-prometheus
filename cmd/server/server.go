@@ -78,7 +78,7 @@ func RunServer() {
 	}
 
 	// start the metrics server
-	api.RunPrometheusMetricsServer(address, scrapreInterval)
+	api.RunPrometheusMetricsServer(ctx, address, scrapreInterval)
 }
 
 // getEnv reads an environment variable or returns a default value.
@@ -97,8 +97,10 @@ func RunMetricsLocal() {
 	nvidiametrics.InitNVML()
 	defer nvidiametrics.ShutdownNVML()
 
+	ctx := context.TODO()
+
 	for {
-		nvidiametrics.CollectGpuMetrics()
+		nvidiametrics.CollectGpuMetrics(ctx)
 		time.Sleep(30 * time.Second)
 		for key, label := range prometheusmetrics.RegisteredLabels {
 			logger.Debug("Registered label", zap.String("key", key), zap.Any("label", label))

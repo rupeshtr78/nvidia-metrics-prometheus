@@ -1,6 +1,8 @@
 package nvidiametrics
 
 import (
+	"context"
+
 	"github.com/NVIDIA/go-nvml/pkg/nvml"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,6 +15,8 @@ type MockNvmlDevice struct {
 	mock.Mock
 	nvml.Device
 }
+
+var ctx = context.TODO()
 
 func (m *MockNvmlDevice) GetUtilizationRates() (nvml.Utilization, nvml.Return) {
 	args := m.Called()
@@ -43,7 +47,7 @@ var _ = Describe("GPUDeviceMetrics", func() {
 			mockHandle.On("SetDeviceMetric", mock.Anything, config.GPU_GPU_UTILIZATION, 50.0).Return().Once()
 			mockHandle.On("SetDeviceMetric", mock.Anything, config.GPU_MEM_UTILIZATION, 60.0).Return().Once()
 
-			err := gpuDeviceMetrics.CollectUtilizationMetrics(mockHandle)
+			err := gpuDeviceMetrics.CollectUtilizationMetrics(ctx, mockHandle)
 			Expect(err).To(Equal(nvml.SUCCESS))
 
 			Expect(gpuDeviceMetrics.GPUCPUUtilization).To(Equal(50.0))
@@ -55,7 +59,7 @@ var _ = Describe("GPUDeviceMetrics", func() {
 		It("should not update metrics if GetUtilizationRates does not return success", func() {
 			mockHandle.On("GetUtilizationRates").Return(nvml.Utilization{}, nvml.ERROR_UNKNOWN).Once()
 
-			err := gpuDeviceMetrics.CollectUtilizationMetrics(mockHandle)
+			err := gpuDeviceMetrics.CollectUtilizationMetrics(ctx, mockHandle)
 			Expect(err).To(Equal(nvml.ERROR_UNKNOWN))
 
 			Expect(gpuDeviceMetrics.GPUCPUUtilization).To(Equal(float64(0)))
