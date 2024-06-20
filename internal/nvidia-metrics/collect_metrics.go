@@ -14,9 +14,9 @@ var labelManager = NewLabelFunction()
 
 // CollectGpuMetrics collects metrics for all the GPUs.
 func CollectGpuMetrics(ctx context.Context) {
-	deviceCount := CollectGPUDeviceCount(ctx)
-	if deviceCount == 0 {
-		logger.Error("No GPU devices found")
+	deviceCount, err := CollectGPUDeviceCount(ctx)
+	if err != nil || deviceCount == 0 {
+		logger.Error("No GPU devices found", zap.Error(err))
 		return
 	}
 
@@ -174,19 +174,19 @@ func collectDeviceMetrics(ctx context.Context, deviceIndex int) (*GPUDeviceMetri
 }
 
 // CollectGPUDeviceCount collects the number of GPU devices.
-func CollectGPUDeviceCount(ctx context.Context) int {
+func CollectGPUDeviceCount(ctx context.Context) (int, error) {
 	var deviceCount int
 	var err nvml.Return
 	select {
 	case <-ctx.Done():
-		return 0
+		return 0, fmt.Errorf("context cancelled")
 	default:
 		deviceCount, err = nvml.DeviceGetCount()
 		if err != nvml.SUCCESS {
 			logger.Error("Error getting device count", zap.Error(fmt.Errorf("nvml error code: %d", err)))
-			return 0
+			return 0, err
 		}
 	}
 
-	return deviceCount
+	return deviceCount, nil
 }
